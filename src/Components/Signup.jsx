@@ -118,7 +118,9 @@ export default function Signup() {
               <li key={text} className="flex items-start gap-3">
                 <span
                   className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                  style={{ backgroundColor: bulletColors[i % bulletColors.length] }}
+                  style={{
+                    backgroundColor: bulletColors[i % bulletColors.length],
+                  }}
                 />
                 {text}
               </li>
