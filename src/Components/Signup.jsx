@@ -87,7 +87,6 @@ export default function Signup() {
 
   return (
     <main className="grid min-h-screen bg-[#FBF6EF] lg:grid-cols-2">
-      {/* Left: brand panel, hidden below lg so the form stays the focus on mobile */}
       <section className="relative hidden overflow-hidden bg-[#F3E9DC] lg:flex lg:flex-col lg:justify-end lg:p-12">
         <div aria-hidden="true" className="absolute inset-0">
           {circles.map((c, i) => (
