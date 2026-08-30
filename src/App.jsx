@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Profile from "./Components/Profile";
 import Signup from "./Components/Signup.jsx";
 import Feed from "./Components/Feed.jsx";
+import Request from "./Components/Request.jsx";
 export default function App() {
   return (
     <>
@@ -14,7 +15,8 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/feed" element={<Feed/>}/>
+            <Route path="/feed" element={<Feed />} />
+            <Route path="/request" element={<Request />} />{" "}
           </Route>
         </Routes>
       </BrowserRouter>
