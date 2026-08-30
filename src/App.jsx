@@ -1,11 +1,11 @@
 import Body from "./Components/Body.jsx";
 import Login from "./Components/Login";
-import Navbar from "./Components/Navbar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Profile from "./Components/Profile";
 import Signup from "./Components/Signup.jsx";
 import Feed from "./Components/Feed.jsx";
 import Request from "./Components/Request.jsx";
+import Connection from "./Components/Connection.jsx";
 export default function App() {
   return (
     <>
@@ -17,6 +17,7 @@ export default function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/feed" element={<Feed />} />
             <Route path="/request" element={<Request />} />{" "}
+            <Route path="/connection" element={<Connection />} />
           </Route>
         </Routes>
       </BrowserRouter>
