@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Loader2, AlertCircle } from "lucide-react";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
+  const [loadError, setLoadError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editProfile, setEditProfile] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -17,10 +20,14 @@ export default function Profile() {
         });
 
         console.log(response.data);
-
         setProfile(response.data);
-      } catch (error) {
-        console.error(error.response?.data || error.message);
+      } catch (err) {
+        console.error(err.response?.data || err.message);
+        setLoadError(
+          err.response?.data?.message ||
+            err.response?.data ||
+            "Couldn't load your profile.",
+        );
       }
     };
 
@@ -28,15 +35,15 @@ export default function Profile() {
   }, []);
 
   const handleSave = async () => {
+    setSaveError(null);
+    setIsSaving(true);
     try {
-      setIsSaving(true);
-
       const updatedData = {
         firstName: editProfile.firstName,
         lastName: editProfile.lastName,
         age: editProfile.age,
         about: editProfile.about,
-        skills: editProfile.skills,
+        skills: (editProfile.skills || []).filter(Boolean),
       };
 
       console.log("Sending to API:", updatedData);
@@ -47,16 +54,26 @@ export default function Profile() {
 
       setProfile({ ...profile, ...updatedData });
       setIsEditing(false);
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      setSaveError(
+        err.response?.data?.message ||
+          err.response?.data ||
+          "Couldn't save your changes. Try again.",
+      );
+    } finally {
       setIsSaving(false);
-    } catch (error) {
-      console.error(error.response?.data || error.message);
     }
   };
 
   if (!profile) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#FBF6EF]">
-        <p className="text-sm text-[#756F68]">Loading profile...</p>
+        <p
+          className={`text-sm ${loadError ? "text-[#C4483D]" : "text-[#756F68]"}`}
+        >
+          {loadError || "Loading profile..."}
+        </p>
       </main>
     );
   }
@@ -69,7 +86,6 @@ export default function Profile() {
         {/* Page heading */}
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-[#2B2A28]">My Profile</h1>
-
           <p className="mt-2 text-sm text-[#756F68]">
             Manage your developer profile
           </p>
@@ -77,43 +93,61 @@ export default function Profile() {
 
         {/* Profile Card */}
         <div className="rounded-3xl bg-white p-8 shadow-xl shadow-[#E8624F]/10">
+          {saveError && (
+            <div
+              role="alert"
+              className="mb-6 flex items-start gap-2 rounded-xl border border-[#C4483D]/30 bg-[#C4483D]/10 px-3 py-2.5 text-sm text-[#C4483D]"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{saveError}</span>
+            </div>
+          )}
+
           {/* Avatar */}
           <div
             className="mx-auto flex h-24 w-24 items-center justify-center rounded-full text-2xl font-bold text-white"
-            style={{
-              backgroundColor: avatarColor,
-            }}
+            style={{ backgroundColor: avatarColor }}
           >
             {profile.firstName?.[0]}
             {profile.lastName?.[0]}
           </div>
 
-          {/* Name */}
+          {/* Name + age */}
           <div className="mt-5 text-center">
             {isEditing ? (
-              <h2>
-                <input
-                  type="text"
-                  value={editProfile.firstName || ""}
-                  onChange={(e) =>
-                    setEditProfile({
-                      ...editProfile,
-                      firstName: e.target.value,
-                    })
-                  }
-                />
+              <div className="grid grid-cols-2 gap-3 text-left">
+                <label className="flex flex-col gap-1.5 text-xs font-medium text-[#8A8178]">
+                  First name
+                  <input
+                    type="text"
+                    value={editProfile.firstName || ""}
+                    onChange={(e) =>
+                      setEditProfile({
+                        ...editProfile,
+                        firstName: e.target.value,
+                      })
+                    }
+                    disabled={isSaving}
+                    className="rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-3 py-2 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30 disabled:opacity-50"
+                  />
+                </label>
 
-                <input
-                  type="text"
-                  value={editProfile.lastName || ""}
-                  onChange={(e) =>
-                    setEditProfile({
-                      ...editProfile,
-                      lastName: e.target.value,
-                    })
-                  }
-                />
-              </h2>
+                <label className="flex flex-col gap-1.5 text-xs font-medium text-[#8A8178]">
+                  Last name
+                  <input
+                    type="text"
+                    value={editProfile.lastName || ""}
+                    onChange={(e) =>
+                      setEditProfile({
+                        ...editProfile,
+                        lastName: e.target.value,
+                      })
+                    }
+                    disabled={isSaving}
+                    className="rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-3 py-2 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30 disabled:opacity-50"
+                  />
+                </label>
+              </div>
             ) : (
               <h2 className="text-2xl font-bold text-[#2B2A28]">
                 {profile.firstName} {profile.lastName}
@@ -121,28 +155,20 @@ export default function Profile() {
             )}
 
             {isEditing ? (
-              <p>
-                <input
-                  type="number"
-                  value={editProfile.age || ""}
-                  onChange={(e) =>
-                    setEditProfile({
-                      ...editProfile,
-                      age: e.target.value,
-                    })
-                  }
-                  placeholder="Age"
-                  className="mt-2 w-32 rounded-lg border border-[#EAE1D3] bg-white px-3 py-2 text-center text-sm outline-none focus:border-[#E8624F]"
-                />
-              </p>
+              <input
+                type="number"
+                value={editProfile.age || ""}
+                onChange={(e) =>
+                  setEditProfile({ ...editProfile, age: e.target.value })
+                }
+                disabled={isSaving}
+                placeholder="Age"
+                className="mt-3 w-32 rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-3 py-2 text-center text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30 disabled:opacity-50"
+              />
             ) : (
-              <h2>
-                <p className="mt-1 text-sm text-[#756F68]">
-                  {profile.age
-                    ? `${profile.age} years old`
-                    : "Age not added yet"}
-                </p>
-              </h2>
+              <p className="mt-1 text-sm text-[#756F68]">
+                {profile.age ? `${profile.age} years old` : "Age not added yet"}
+              </p>
             )}
           </div>
 
@@ -157,11 +183,12 @@ export default function Profile() {
               <textarea
                 value={editProfile.about || ""}
                 onChange={(e) =>
-                  setEditProfile({
-                    ...editProfile,
-                    about: e.target.value,
-                  })
+                  setEditProfile({ ...editProfile, about: e.target.value })
                 }
+                disabled={isSaving}
+                rows={4}
+                placeholder="Tell people what you're building, your stack, or what you're looking for..."
+                className="mt-3 w-full resize-none rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-3 py-2 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30 disabled:opacity-50"
               />
             ) : (
               <p className="mt-1 text-sm text-[#756F68]">
@@ -179,20 +206,26 @@ export default function Profile() {
             <h3 className="text-lg font-bold text-[#2B2A28]">Skills</h3>
 
             {isEditing ? (
-              <input
-                type="text"
-                value={editProfile.skills?.join(", ") || ""}
-                placeholder="React, JavaScript, Node.js"
-                onChange={(e) =>
-                  setEditProfile({
-                    ...editProfile,
-                    skills: e.target.value
-                      .split(",")
-                      .map((skill) => skill.trim()),
-                  })
-                }
-                className="mt-4 w-full rounded-lg border border-[#EAE1D3] bg-white px-4 py-3 text-sm outline-none focus:border-[#E8624F]"
-              />
+              <>
+                <input
+                  type="text"
+                  value={editProfile.skills?.join(", ") || ""}
+                  placeholder="React, JavaScript, Node.js"
+                  onChange={(e) =>
+                    setEditProfile({
+                      ...editProfile,
+                      skills: e.target.value
+                        .split(",")
+                        .map((skill) => skill.trim()),
+                    })
+                  }
+                  disabled={isSaving}
+                  className="mt-3 w-full rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-3 py-2 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30 disabled:opacity-50"
+                />
+                <p className="mt-1.5 text-xs text-[#8A8178]">
+                  Separate each skill with a comma.
+                </p>
+              </>
             ) : profile.skills?.length > 0 ? (
               <div className="mt-4 flex flex-wrap gap-2">
                 {profile.skills.map((skill) => (
@@ -211,12 +244,32 @@ export default function Profile() {
             )}
           </section>
 
-          {/* Edit Button */}
+          {/* Edit / Save buttons */}
           {isEditing ? (
             <div className="mt-8 flex gap-3">
-              <button onClick={() => setIsEditing(false)}>Cancel</button>
-              <button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Changes"}
+              <button
+                onClick={() => {
+                  setIsEditing(false);
+                  setSaveError(null);
+                }}
+                disabled={isSaving}
+                className="flex-1 rounded-full border border-[#EAE1D3] px-6 py-2.5 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#E8624F] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  "Save changes"
+                )}
               </button>
             </div>
           ) : (
@@ -225,8 +278,9 @@ export default function Profile() {
                 setIsEditing(true);
                 setEditProfile({ ...profile });
               }}
+              className="mt-8 w-full rounded-full bg-[#E8624F] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544]"
             >
-              Edit Profile
+              Edit profile
             </button>
           )}
         </div>

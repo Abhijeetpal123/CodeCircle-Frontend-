@@ -1,12 +1,29 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import axios from "axios";
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isActive = (path) => location.pathname === path;
+
+  const handleLogOut = async () => {
+    try {
+      await axios.post(
+        "http://localhost:7777/logout",
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      navigate("/login");
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#EAE1D3] bg-[#FBF6EF]">
@@ -41,6 +58,12 @@ export default function Navbar() {
           >
             Sign up
           </Link>
+          <button
+            onClick={handleLogOut}
+            className="rounded-full border border-[#EAE1D3] px-5 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] cursor-pointer"
+          >
+            Logout
+          </button>
         </div>
 
         {/* Mobile toggle */}
@@ -51,7 +74,11 @@ export default function Navbar() {
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMenuOpen}
         >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {isMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
         </button>
       </nav>
 
