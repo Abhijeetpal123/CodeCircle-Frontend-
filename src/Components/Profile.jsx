@@ -5,6 +5,9 @@ const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editProfile, setEditProfile] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const getProfile = async () => {
@@ -24,7 +27,32 @@ export default function Profile() {
     getProfile();
   }, []);
 
-  // Prevent accessing profile data before API response arrives
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+
+      const updatedData = {
+        firstName: editProfile.firstName,
+        lastName: editProfile.lastName,
+        age: editProfile.age,
+        about: editProfile.about,
+        skills: editProfile.skills,
+      };
+
+      console.log("Sending to API:", updatedData);
+
+      await axios.patch("http://localhost:7777/profile/edit", updatedData, {
+        withCredentials: true,
+      });
+
+      setProfile({ ...profile, ...updatedData });
+      setIsEditing(false);
+      setIsSaving(false);
+    } catch (error) {
+      console.error(error.response?.data || error.message);
+    }
+  };
+
   if (!profile) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#FBF6EF]">
@@ -62,13 +90,60 @@ export default function Profile() {
 
           {/* Name */}
           <div className="mt-5 text-center">
-            <h2 className="text-2xl font-bold text-[#2B2A28]">
-              {profile.firstName} {profile.lastName}
-            </h2>
+            {isEditing ? (
+              <h2>
+                <input
+                  type="text"
+                  value={editProfile.firstName || ""}
+                  onChange={(e) =>
+                    setEditProfile({
+                      ...editProfile,
+                      firstName: e.target.value,
+                    })
+                  }
+                />
 
-            <p className="mt-1 text-sm text-[#756F68]">
-              {profile.age ? `${profile.age} years old` : "Age not added yet"}
-            </p>
+                <input
+                  type="text"
+                  value={editProfile.lastName || ""}
+                  onChange={(e) =>
+                    setEditProfile({
+                      ...editProfile,
+                      lastName: e.target.value,
+                    })
+                  }
+                />
+              </h2>
+            ) : (
+              <h2 className="text-2xl font-bold text-[#2B2A28]">
+                {profile.firstName} {profile.lastName}
+              </h2>
+            )}
+
+            {isEditing ? (
+              <p>
+                <input
+                  type="number"
+                  value={editProfile.age || ""}
+                  onChange={(e) =>
+                    setEditProfile({
+                      ...editProfile,
+                      age: e.target.value,
+                    })
+                  }
+                  placeholder="Age"
+                  className="mt-2 w-32 rounded-lg border border-[#EAE1D3] bg-white px-3 py-2 text-center text-sm outline-none focus:border-[#E8624F]"
+                />
+              </p>
+            ) : (
+              <h2>
+                <p className="mt-1 text-sm text-[#756F68]">
+                  {profile.age
+                    ? `${profile.age} years old`
+                    : "Age not added yet"}
+                </p>
+              </h2>
+            )}
           </div>
 
           {/* Divider */}
@@ -78,10 +153,22 @@ export default function Profile() {
           <section>
             <h3 className="text-lg font-bold text-[#2B2A28]">About</h3>
 
-            <p className="mt-3 leading-relaxed text-[#756F68]">
-              {profile.about ||
-                "This developer hasn't added an About section yet."}
-            </p>
+            {isEditing ? (
+              <textarea
+                value={editProfile.about || ""}
+                onChange={(e) =>
+                  setEditProfile({
+                    ...editProfile,
+                    about: e.target.value,
+                  })
+                }
+              />
+            ) : (
+              <p className="mt-1 text-sm text-[#756F68]">
+                {profile.about ||
+                  "This developer hasn't added an About section yet."}
+              </p>
+            )}
           </section>
 
           {/* Divider */}
@@ -91,7 +178,22 @@ export default function Profile() {
           <section>
             <h3 className="text-lg font-bold text-[#2B2A28]">Skills</h3>
 
-            {profile.skills?.length > 0 ? (
+            {isEditing ? (
+              <input
+                type="text"
+                value={editProfile.skills?.join(", ") || ""}
+                placeholder="React, JavaScript, Node.js"
+                onChange={(e) =>
+                  setEditProfile({
+                    ...editProfile,
+                    skills: e.target.value
+                      .split(",")
+                      .map((skill) => skill.trim()),
+                  })
+                }
+                className="mt-4 w-full rounded-lg border border-[#EAE1D3] bg-white px-4 py-3 text-sm outline-none focus:border-[#E8624F]"
+              />
+            ) : profile.skills?.length > 0 ? (
               <div className="mt-4 flex flex-wrap gap-2">
                 {profile.skills.map((skill) => (
                   <span
@@ -110,9 +212,23 @@ export default function Profile() {
           </section>
 
           {/* Edit Button */}
-          <button className="mt-8 w-full cursor-pointer rounded-full bg-[#E8624F] px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544]">
-            Edit Profile
-          </button>
+          {isEditing ? (
+            <div className="mt-8 flex gap-3">
+              <button onClick={() => setIsEditing(false)}>Cancel</button>
+              <button onClick={handleSave} disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setIsEditing(true);
+                setEditProfile({ ...profile });
+              }}
+            >
+              Edit Profile
+            </button>
+          )}
         </div>
       </div>
     </main>
