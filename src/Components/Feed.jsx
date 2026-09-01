@@ -5,6 +5,8 @@ const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
 export default function Feed() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [requestLoading, setRequestLoading] = useState(null);
 
   useEffect(() => {
     const getFeed = async () => {
@@ -14,28 +16,37 @@ export default function Feed() {
           { withCredentials: true },
         );
 
-        console.log(response.data);
         setUsers(response.data.data);
       } catch (err) {
         console.error(err.response?.data || err.message);
+      } finally {
+        setLoading(false);
       }
     };
+
     getFeed();
   }, []);
 
   const handleRequest = async (status, toUserId) => {
     try {
+      // Set loading for this specific user
+      setRequestLoading(toUserId);
+
       await axios.post(
         `http://localhost:7777/request/send/${status}/${toUserId}`,
         {},
         { withCredentials: true },
       );
 
+      // Remove the user after successful request
       setUsers((previousUsers) =>
         previousUsers.filter((user) => user._id !== toUserId),
       );
     } catch (err) {
       console.error(err.response?.data || err.message);
+    } finally {
+      // Enable buttons again
+      setRequestLoading(null);
     }
   };
 
@@ -45,12 +56,17 @@ export default function Feed() {
         <h1 className="text-2xl font-bold text-[#2B2A28]">
           Discover Developers
         </h1>
+
         <p className="mt-2 text-sm text-[#756F68]">
           Find people to connect and collaborate with.
         </p>
       </div>
 
-      {users.length === 0 ? (
+      {loading ? (
+        <p className="text-center text-sm text-[#8A8178]">
+          Loading Developers...
+        </p>
+      ) : users.length === 0 ? (
         <p className="text-center text-sm text-[#8A8178]">
           You're all caught up — no new developers to show right now.
         </p>
@@ -74,9 +90,11 @@ export default function Feed() {
               <h3 className="text-lg font-bold text-[#2B2A28]">
                 {user.firstName} {user.lastName}
               </h3>
+
               <p className="mt-1 text-sm text-[#8A8178]">
                 {user.age ? `${user.age} years old` : "Age not added yet"}
               </p>
+
               <p className="mt-3 line-clamp-3 text-sm text-[#756F68]">
                 {user.about || "This developer hasn't added an About yet."}
               </p>
@@ -96,16 +114,23 @@ export default function Feed() {
 
               <div className="mt-6 flex justify-center gap-3">
                 <button
+                  disabled={requestLoading === user._id}
                   onClick={() => handleRequest("ignored", user._id)}
-                  className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] cursor-pointer"
+                  className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Ignore
+                  {requestLoading === user._id
+                    ? "Processing..."
+                    : "Ignore"}
                 </button>
+
                 <button
+                  disabled={requestLoading === user._id}
                   onClick={() => handleRequest("interested", user._id)}
-                  className="rounded-full bg-[#E8624F] px-6 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] cursor-pointer"
+                  className="rounded-full bg-[#E8624F] px-6 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  Interested
+                  {requestLoading === user._id
+                    ? "Sending..."
+                    : "Interested"}
                 </button>
               </div>
             </div>
