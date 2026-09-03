@@ -35,9 +35,7 @@ export default function Connection() {
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">
       <div className="mx-auto mb-10 max-w-md text-center">
-        <h1 className="text-2xl font-bold text-[#2B2A28]">
-          Your Connections
-        </h1>
+        <h1 className="text-2xl font-bold text-[#2B2A28]">Your Connections</h1>
         <p className="mt-2 text-sm text-[#756F68]">
           People you've connected with
         </p>
@@ -79,6 +77,21 @@ export default function Connection() {
                 <h3 className="text-lg font-bold text-[#2B2A28]">
                   {connection.firstName} {connection.lastName}
                 </h3>
+                <p className="mt-3 text-sm text-[#756F68]">
+                  {connection.about || "This developer hasn't added About yet"}
+                </p>
+               {(connection.skills || []).length > 0 && (
+  <div className="mt-4 flex flex-wrap justify-center gap-1.5">
+    {connection.skills.map((skill) => (
+      <span
+        key={skill}
+        className="rounded-full bg-[#F3E9DC] px-2.5 py-1 text-xs font-medium text-[#5B8C6E]"
+      >
+        {skill}
+      </span>
+    ))}
+  </div>
+)}
               </div>
             );
           })}

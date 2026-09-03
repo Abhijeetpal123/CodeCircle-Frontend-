@@ -5,6 +5,7 @@ const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
 export default function Request() {
   const [requests, setRequests] = useState([]);
+  const[reviewLoading,setReviewLoading]=useState(null)
 
   useEffect(() => {
     const getRequest = async () => {
@@ -23,17 +24,21 @@ export default function Request() {
   }, []);
 
   const handleReview = async (status, requestId) => {
+    setReviewLoading(requestId);
     try {
       await axios.post(
         `http://localhost:7777/request/review/${status}/${requestId}`,
         {},
         { withCredentials: true },
       );
+
       setRequests((previousRequests) =>
         previousRequests.filter((request) => request._id !== requestId),
       );
     } catch (err) {
       console.error(err.response?.data || err.message);
+    }finally{
+      setReviewLoading(null)
     }
   };
 
@@ -88,16 +93,18 @@ export default function Request() {
 
                 <div className="mt-6 flex justify-center gap-3">
                   <button
+                  disabled={reviewLoading===request._id}
                     onClick={() => handleReview("rejected", request._id)}
                     className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] cursor-pointer"
                   >
-                    Reject
+                  {reviewLoading===request._id?"Processing....":"Reject"}
                   </button>
                   <button
+                  disabled={reviewLoading===request._id}
                     onClick={() => handleReview("accepted", request._id)}
                     className="rounded-full bg-[#E8624F] px-6 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] cursor-pointer"
                   >
-                    Accept
+                   {reviewLoading===request._id?"Processing...":"Accept"}
                   </button>
                 </div>
               </div>
