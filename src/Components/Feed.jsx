@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
@@ -7,6 +8,7 @@ export default function Feed() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [requestLoading, setRequestLoading] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getFeed = async () => {
@@ -112,27 +114,36 @@ export default function Feed() {
                 </div>
               )}
 
-              <div className="mt-6 flex justify-center gap-3">
-                <button
-                  disabled={requestLoading === user._id}
-                  onClick={() => handleRequest("ignored", user._id)}
-                  className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {requestLoading === user._id
-                    ? "Processing..."
-                    : "Ignore"}
-                </button>
+              
 
-                <button
-                  disabled={requestLoading === user._id}
-                  onClick={() => handleRequest("interested", user._id)}
-                  className="rounded-full bg-[#E8624F] px-6 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {requestLoading === user._id
-                    ? "Sending..."
-                    : "Interested"}
-                </button>
-              </div>
+              <div className="mt-6 flex flex-col gap-3">
+  {/* View Profile */}
+  <button
+    onClick={() => navigate(`/user/${user._id}`)}
+    className="w-full rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-4 py-2.5 text-sm font-semibold text-[#5B8C6E] transition hover:bg-[#F3E9DC] cursor-pointer"
+  >
+    View Profile →
+  </button>
+
+  {/* Actions */}
+  <div className="flex justify-center gap-3">
+    <button
+      disabled={requestLoading === user._id}
+      onClick={() => handleRequest("ignored", user._id)}
+      className="flex-1 rounded-full border border-[#EAE1D3] px-5 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {requestLoading === user._id ? "Processing..." : "Ignore"}
+    </button>
+
+    <button
+      disabled={requestLoading === user._id}
+      onClick={() => handleRequest("interested", user._id)}
+      className="flex-1 rounded-full bg-[#E8624F] px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      {requestLoading === user._id ? "Sending..." : "Interested"}
+    </button>
+  </div>
+</div>
             </div>
           ))}
         </div>

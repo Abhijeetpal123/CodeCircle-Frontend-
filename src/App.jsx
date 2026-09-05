@@ -7,6 +7,7 @@ import Feed from "./Components/Feed.jsx";
 import Request from "./Components/Request.jsx";
 import Connection from "./Components/Connection.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute";
+import UserProfile from "./Components/UserProfile.jsx";
 export default function App() {
   return (
     <>
@@ -48,6 +49,14 @@ export default function App() {
               }
             />
           </Route>
+          <Route
+            path="/user/:userId"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          ></Route>
         </Routes>
       </BrowserRouter>
     </>

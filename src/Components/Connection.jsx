@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Check } from "lucide-react";
+
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
 export default function Connection() {
@@ -57,41 +59,63 @@ export default function Connection() {
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {connections.map((connection, i) => {
             const color = avatarColors[i % avatarColors.length];
+            const skills = connection.skills || [];
+            const visibleSkills = skills.slice(0, 4);
+            const extraSkillsCount = skills.length - visibleSkills.length;
 
             return (
               <div
                 key={connection._id}
-                className="flex flex-col rounded-3xl bg-white p-8 text-center shadow-xl shadow-[#E8624F]/10 transition hover:-translate-y-1 hover:shadow-2xl"
+                className="flex h-full flex-col rounded-3xl bg-white p-8 text-center shadow-xl shadow-[#E8624F]/10 transition hover:-translate-y-1 hover:shadow-2xl"
               >
-                <div
-                  className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full text-lg font-bold text-white"
-                  style={{
-                    backgroundColor: color,
-                    boxShadow: `0 0 0 6px ${color}26`,
-                  }}
-                >
-                  {connection.firstName?.[0]}
-                  {connection.lastName?.[0]}
+                <div className="relative mx-auto mb-4">
+                  <div
+                    className="flex h-20 w-20 items-center justify-center rounded-full text-lg font-bold text-white"
+                    style={{
+                      backgroundColor: color,
+                      boxShadow: `0 0 0 6px ${color}26`,
+                    }}
+                  >
+                    {connection.firstName?.[0]}
+                    {connection.lastName?.[0]}
+                  </div>
+                  <span
+                    className="absolute -right-1 -bottom-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#5B8C6E] text-white"
+                    title="Connected"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                  </span>
                 </div>
 
                 <h3 className="text-lg font-bold text-[#2B2A28]">
                   {connection.firstName} {connection.lastName}
                 </h3>
-                <p className="mt-3 text-sm text-[#756F68]">
-                  {connection.about || "This developer hasn't added About yet"}
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#5B8C6E]">
+                  Connected
                 </p>
-               {(connection.skills || []).length > 0 && (
-  <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-    {connection.skills.map((skill) => (
-      <span
-        key={skill}
-        className="rounded-full bg-[#F3E9DC] px-2.5 py-1 text-xs font-medium text-[#5B8C6E]"
-      >
-        {skill}
-      </span>
-    ))}
-  </div>
-)}
+
+                <p className="mt-3 line-clamp-2 text-sm text-[#756F68]">
+                  {connection.about ||
+                    "This developer hasn't added an About yet."}
+                </p>
+
+                {visibleSkills.length > 0 && (
+                  <div className="mt-4 flex flex-1 flex-wrap items-end justify-center gap-1.5">
+                    {visibleSkills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="rounded-full bg-[#F3E9DC] px-2.5 py-1 text-xs font-medium text-[#5B8C6E]"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                    {extraSkillsCount > 0 && (
+                      <span className="rounded-full bg-[#FBF6EF] px-2.5 py-1 text-xs font-medium text-[#8A8178]">
+                        +{extraSkillsCount} more
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
