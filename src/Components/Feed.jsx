@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Search, X } from "lucide-react";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
@@ -8,13 +9,15 @@ export default function Feed() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [requestLoading, setRequestLoading] = useState(null);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     const getFeed = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:7777/user/feed?page=1&limit=10",
+          `http://localhost:7777/user/feed?page=1&limit=10&search=${debouncedSearch}`,
           { withCredentials: true },
         );
 
@@ -27,7 +30,7 @@ export default function Feed() {
     };
 
     getFeed();
-  }, []);
+  }, [debouncedSearch]);
 
   const handleRequest = async (status, toUserId) => {
     try {
@@ -52,6 +55,13 @@ export default function Feed() {
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">
       <div className="mx-auto mb-10 max-w-md text-center">
@@ -62,6 +72,27 @@ export default function Feed() {
         <p className="mt-2 text-sm text-[#756F68]">
           Find people to connect and collaborate with.
         </p>
+
+        <div className="relative mt-6">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A8178]" />
+          <input
+            type="text"
+            placeholder="Search by name or skill..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-full border border-[#EAE1D3] bg-white py-2.5 pl-10 pr-10 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              aria-label="Clear search"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8A8178] transition hover:text-[#2B2A28]"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -70,7 +101,9 @@ export default function Feed() {
         </p>
       ) : users.length === 0 ? (
         <p className="text-center text-sm text-[#8A8178]">
-          You're all caught up — no new developers to show right now.
+          {debouncedSearch
+            ? `No developers match "${debouncedSearch}".`
+            : "You're all caught up — no new developers to show right now."}
         </p>
       ) : (
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -114,36 +147,34 @@ export default function Feed() {
                 </div>
               )}
 
-              
-
               <div className="mt-6 flex flex-col gap-3">
-  {/* View Profile */}
-  <button
-    onClick={() => navigate(`/user/${user._id}`)}
-    className="w-full rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-4 py-2.5 text-sm font-semibold text-[#5B8C6E] transition hover:bg-[#F3E9DC] cursor-pointer"
-  >
-    View Profile →
-  </button>
+                {/* View Profile */}
+                <button
+                  onClick={() => navigate(`/user/${user._id}`)}
+                  className="w-full rounded-xl border border-[#EAE1D3] bg-[#FBF6EF] px-4 py-2.5 text-sm font-semibold text-[#5B8C6E] transition hover:bg-[#F3E9DC] cursor-pointer"
+                >
+                  View Profile →
+                </button>
 
-  {/* Actions */}
-  <div className="flex justify-center gap-3">
-    <button
-      disabled={requestLoading === user._id}
-      onClick={() => handleRequest("ignored", user._id)}
-      className="flex-1 rounded-full border border-[#EAE1D3] px-5 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {requestLoading === user._id ? "Processing..." : "Ignore"}
-    </button>
+                {/* Actions */}
+                <div className="flex justify-center gap-3">
+                  <button
+                    disabled={requestLoading === user._id}
+                    onClick={() => handleRequest("ignored", user._id)}
+                    className="flex-1 rounded-full border border-[#EAE1D3] px-5 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {requestLoading === user._id ? "Processing..." : "Ignore"}
+                  </button>
 
-    <button
-      disabled={requestLoading === user._id}
-      onClick={() => handleRequest("interested", user._id)}
-      className="flex-1 rounded-full bg-[#E8624F] px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-50"
-    >
-      {requestLoading === user._id ? "Sending..." : "Interested"}
-    </button>
-  </div>
-</div>
+                  <button
+                    disabled={requestLoading === user._id}
+                    onClick={() => handleRequest("interested", user._id)}
+                    className="flex-1 rounded-full bg-[#E8624F] px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {requestLoading === user._id ? "Sending..." : "Interested"}
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
