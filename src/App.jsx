@@ -8,6 +8,7 @@ import Request from "./Components/Request.jsx";
 import Connection from "./Components/Connection.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import UserProfile from "./Components/UserProfile.jsx";
+import Home from "./Components/Home.jsx";
 export default function App() {
   return (
     <>
@@ -15,6 +16,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Body />}>
             <Route path="/login" element={<Login />} />
+            <Route index element={<Home />} />
             <Route
               path="/profile"
               element={
