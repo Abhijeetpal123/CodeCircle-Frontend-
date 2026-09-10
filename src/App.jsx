@@ -9,6 +9,7 @@ import Connection from "./Components/Connection.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import UserProfile from "./Components/UserProfile.jsx";
 import Home from "./Components/Home.jsx";
+import Post from "./Components/Post.jsx";
 export default function App() {
   return (
     <>
@@ -56,6 +57,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <UserProfile />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="/post"
+            element={
+              <ProtectedRoute>
+                <Post />
               </ProtectedRoute>
             }
           ></Route>
