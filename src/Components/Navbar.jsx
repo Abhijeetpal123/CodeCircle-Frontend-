@@ -70,6 +70,9 @@ export default function Navbar() {
               <Link className={navLinkClass("/feed")} to="/feed">
                 Feed
               </Link>
+              <Link className={navLinkClass("/post")} to="/post">
+                Posts
+              </Link>
               <Link className={navLinkClass("/request")} to="/request">
                 Requests
               </Link>
@@ -130,6 +133,14 @@ export default function Navbar() {
                   className={navLinkClass("/feed")}
                 >
                   Feed
+                </Link>
+
+                <Link
+                  to="/post"
+                  onClick={() => setIsMenuOpen(false)}
+                  className={navLinkClass("/post")}
+                >
+                  Posts
                 </Link>
                 <Link
                   to="/request"

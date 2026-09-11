@@ -116,6 +116,9 @@ export default function Connection() {
                     )}
                   </div>
                 )}
+                <div className="px-4 py-2">
+                  <button className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] cursor-pointer" >Message</button>
+                  </div>
               </div>
             );
           })}

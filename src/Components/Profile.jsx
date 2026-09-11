@@ -313,7 +313,11 @@ export default function Profile() {
                           placeholder="B.Tech"
                           value={edu.degree || ""}
                           onChange={(e) =>
-                            updateEducationField(index, "degree", e.target.value)
+                            updateEducationField(
+                              index,
+                              "degree",
+                              e.target.value,
+                            )
                           }
                           disabled={isSaving}
                           className="rounded-lg border border-[#EAE1D3] bg-white px-3 py-2 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30 disabled:opacity-50"
