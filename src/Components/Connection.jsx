@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
@@ -24,8 +25,8 @@ export default function Connection() {
         console.error(err.response?.data || err.message);
         setError(
           err.response?.data?.message ||
-            err.response?.data ||
-            "Couldn't load your connections.",
+          err.response?.data ||
+          "Couldn't load your connections.",
         );
       } finally {
         setIsLoading(false);
@@ -117,8 +118,12 @@ export default function Connection() {
                   </div>
                 )}
                 <div className="px-4 py-2">
-                  <button className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] cursor-pointer" >Message</button>
-                  </div>
+                  <Link to={"/chat/" + connection._id}>
+                    <button className="rounded-full border border-[#EAE1D3] px-6 py-2 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] cursor-pointer">
+                      Message
+                    </button>
+                  </Link>
+                </div>
               </div>
             );
           })}
