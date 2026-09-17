@@ -82,6 +82,7 @@ export default function Navbar() {
               <Link className={navLinkClass("/profile")} to="/profile">
                 Profile
               </Link>
+              
 
               <button
                 onClick={handleLogOut}

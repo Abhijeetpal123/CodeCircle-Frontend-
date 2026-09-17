@@ -28,7 +28,7 @@ function ChatHeader({ targetUser, targetUserID, onBack }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Yahan route path ko /user/ kar diya gaya hai
+  // Yahan route path ko /user
   const profileUrl = `/user/${targetUserID}`;
 
   return (
@@ -198,7 +198,9 @@ function MessageList({ messages, currentUserId, isLoading, error, onRetry }) {
         <div className="mb-1 flex h-14 w-14 items-center justify-center rounded-full bg-[#EAE1D3]">
           <MessageSquare className="h-7 w-7 text-[#5B8C6E]" />
         </div>
-        <p className="font-semibold text-lg text-[#2B2A28]">Start a conversation</p>
+        <p className="font-semibold text-lg text-[#2B2A28]">
+          Start a conversation
+        </p>
         <p className="max-w-xs text-sm text-[#8A8178]">
           Connect with this developer and start talking about projects,
           technologies, or opportunities.
@@ -252,14 +254,15 @@ function ChatInput({ message, setMessage, onSend }) {
       </div>
       <div className="text-center mt-2 hidden sm:block">
         <span className="text-[11px] text-[#8A8178]">
-          <strong>Enter</strong> to send, <strong>Shift + Enter</strong> for new line
+          <strong>Enter</strong> to send, <strong>Shift + Enter</strong> for new
+          line
         </span>
       </div>
     </div>
   );
 }
 
-// ---- main component (your original logic, untouched) ----
+// ---- main component ----
 
 export default function Chat() {
   const { userId: targetUserID } = useParams();
@@ -277,12 +280,9 @@ export default function Chat() {
       try {
         console.log("1. PROFILE REQUEST START");
 
-        const response = await axios.get(
-          "http://localhost:7777/profile/view",
-          {
-            withCredentials: true,
-          },
-        );
+        const response = await axios.get("http://localhost:7777/profile/view", {
+          withCredentials: true,
+        });
 
         console.log("2. PROFILE RESPONSE:", response.data);
 
@@ -383,10 +383,10 @@ export default function Chat() {
 
   return (
     <main className="flex h-[100dvh] flex-col bg-[#FBF6EF] font-sans text-[#2B2A28]">
-      <ChatHeader 
-        targetUser={targetUser} 
-        targetUserID={targetUserID} 
-        onBack={() => navigate(-1)} 
+      <ChatHeader
+        targetUser={targetUser}
+        targetUserID={targetUserID}
+        onBack={() => navigate(-1)}
       />
 
       <MessageList

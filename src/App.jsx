@@ -52,28 +52,26 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/post"
+            element={
+              <ProtectedRoute>
+                <Post/>
+              </ProtectedRoute>
+            }
+            />
+            <Route path="/chat/:userId"
+            element={
+              <ProtectedRoute>
+                <Chat/>
+              </ProtectedRoute>
+            }
+            />
           </Route>
           <Route
             path="/user/:userId"
             element={
               <ProtectedRoute>
                 <UserProfile />
-              </ProtectedRoute>
-            }
-          ></Route>
-          <Route
-            path="/post"
-            element={
-              <ProtectedRoute>
-                <Post />
-              </ProtectedRoute>
-            }
-          ></Route>
-          <Route
-            path="/chat/:userId"
-            element={
-              <ProtectedRoute>
-                <Chat />
               </ProtectedRoute>
             }
           ></Route>
