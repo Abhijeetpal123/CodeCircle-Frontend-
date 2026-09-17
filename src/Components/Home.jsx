@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Compass, Users, Sprout } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const techStack = ["React", "Node.js", "Python", "Go", "TypeScript", "Rust"];
 
@@ -119,6 +121,33 @@ function HeroDemo() {
 }
 
 export default function Home() {
+  const navigate = useNavigate();
+const [checkingAuth, setCheckingAuth] = useState(true);
+
+useEffect(() => {
+  const checkAuth = async () => {
+    try {
+      await axios.get("http://localhost:7777/profile/view", {
+        withCredentials: true,
+      });
+
+      // User is already logged in
+      navigate("/feed", { replace: true });
+    } catch (err) {
+      // User is not logged in
+      setCheckingAuth(false);
+    }
+  };
+
+  checkAuth();
+}, [navigate]);
+if (checkingAuth) {
+  return (
+    <div className="min-h-screen bg-[#FBF6EF] flex items-center justify-center">
+      <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAE1D3] border-t-[#5B8C6E]" />
+    </div>
+  );
+}
   return (
     <main className="min-h-screen bg-[#FBF6EF]">
       {/* Hero */}

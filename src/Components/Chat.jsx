@@ -136,7 +136,7 @@ function MessageBubble({ message, isOwn }) {
     <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
       <div className="max-w-[85%] md:max-w-[70%]">
         <div
-          className={`px-4 py-2.5 text-[15px] leading-relaxed shadow-sm break-words whitespace-pre-wrap ${
+          className={`px-4 py-2.5 text-[15px] leading-relaxed shadow-sm wrap-break- whitespace-pre-wrap ${
             isOwn
               ? "rounded-2xl rounded-br-sm bg-[#5B8C6E] text-white"
               : "rounded-2xl rounded-bl-sm border border-[#EAE1D3] bg-white text-[#2B2A28]"
@@ -247,7 +247,7 @@ function ChatInput({ message, setMessage, onSend }) {
           onClick={onSend}
           disabled={!message.trim()}
           aria-label="Send message"
-          className="flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full bg-[#5B8C6E] text-white transition hover:bg-[#4A7359] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#5B8C6E]"
+          className="flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-full bg-[#5B8C6E] text-white transition hover:bg-[#4A7359] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#5B8C6E]"
         >
           <Send className="h-5 w-5" />
         </button>
@@ -382,7 +382,7 @@ export default function Chat() {
   };
 
   return (
-    <main className="flex h-[100dvh] flex-col bg-[#FBF6EF] font-sans text-[#2B2A28]">
+    <main className="flex h-dvh flex-col bg-[#FBF6EF] font-sans text-[#2B2A28]">
       <ChatHeader
         targetUser={targetUser}
         targetUserID={targetUserID}

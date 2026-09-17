@@ -194,14 +194,14 @@ export default function Feed() {
                 {/* =================================
                     ABOUT (Sleeker line-clamp and tighter min-height)
                 ================================= */}
-                <p className="mt-3 min-h-[40px] text-[13px] leading-5 text-[#756F68] line-clamp-2">
+                <p className="mt-3 min-h-10 text-[13px] leading-5 text-[#756F68] line-clamp-2">
                   {user.about || "This developer hasn't added an About yet."}
                 </p>
 
                 {/* =================================
                     SKILLS
                 ================================= */}
-                <div className="mt-3 min-h-[28px]">
+                <div className="mt-3 min-h-7">
                   <div className="flex flex-wrap justify-center gap-1.5">
                     {skills.slice(0, 4).map((skill) => (
                       <span

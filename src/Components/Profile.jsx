@@ -41,14 +41,16 @@ export default function Profile() {
     getProfile();
   }, []);
 
+  // BUG FIX: Added (editProfile.education || []) to prevent crash if undefined
   const updateEducationField = (index, field, value) => {
-    const updatedEducation = [...editProfile.education];
+    const updatedEducation = [...(editProfile.education || [])];
     updatedEducation[index] = { ...updatedEducation[index], [field]: value };
     setEditProfile({ ...editProfile, education: updatedEducation });
   };
 
+  // BUG FIX: Added (editProfile.education || []) to prevent crash if undefined
   const removeEducation = (index) => {
-    const updatedEducation = editProfile.education.filter(
+    const updatedEducation = (editProfile.education || []).filter(
       (_, i) => i !== index,
     );
     setEditProfile({ ...editProfile, education: updatedEducation });
@@ -510,7 +512,12 @@ export default function Profile() {
             <button
               onClick={() => {
                 setIsEditing(true);
-                setEditProfile({ ...profile });
+                // BUG FIX: Ensure arrays exist when entering edit mode
+                setEditProfile({ 
+                  ...profile,
+                  education: profile.education || [],
+                  skills: profile.skills || []
+                });
               }}
               className="mt-8 w-full rounded-full bg-[#E8624F] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544]"
             >

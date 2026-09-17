@@ -55,7 +55,7 @@ export default function Navbar() {
         className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4"
       >
         <Link
-          to="/"
+          to={isLoggedIn?"/feed":"/"}
           className="inline-flex items-center gap-1.5 text-lg font-bold text-[#2B2A28]"
           aria-label="CodeCircle home"
         >
@@ -82,7 +82,7 @@ export default function Navbar() {
               <Link className={navLinkClass("/profile")} to="/profile">
                 Profile
               </Link>
-              
+
 
               <button
                 onClick={handleLogOut}

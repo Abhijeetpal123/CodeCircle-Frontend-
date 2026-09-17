@@ -57,7 +57,7 @@ export default function Login() {
         },
         { withCredentials: true },
       );
-      navigate("/"); // adjust to wherever a logged-in user should land
+      navigate("/feed"); // adjust to wherever a logged-in user should land
     } catch (err) {
       setError(
         err.response?.data?.message ||

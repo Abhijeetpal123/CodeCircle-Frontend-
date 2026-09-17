@@ -27,8 +27,17 @@ export default function ProtectedRoute({ children }) {
 
   // API is still checking
   if (isLoading) {
-    return <div>Checking authentication...</div>;
-  }
+  return (
+    <div className="min-h-[calc(100vh-72px)] bg-[#FBF6EF] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#EAE1D3] border-t-[#5B8C6E]" />
+        <p className="text-sm font-medium text-[#8A8178]">
+          Loading...
+        </p>
+      </div>
+    </div>
+  );
+}
 
   // User is not logged in
   if (!isAuthenticated) {

@@ -119,7 +119,7 @@ export default function Connection() {
                 {/* =================================
                     ABOUT (Fixed min-height)
                 ================================= */}
-                <p className="mt-3 min-h-[40px] text-[13px] leading-5 text-[#756F68] line-clamp-2">
+                <p className="mt-3 min-h-10 text-[13px] leading-5 text-[#756F68] line-clamp-2">
                   {connection.about ||
                     "This developer hasn't added an About yet."}
                 </p>
@@ -127,7 +127,7 @@ export default function Connection() {
                 {/* =================================
                     SKILLS (Fixed min-height)
                 ================================= */}
-                <div className="mt-3 min-h-[28px]">
+                <div className="mt-3 min-h-7">
                   <div className="flex flex-wrap justify-center gap-1.5">
                     {visibleSkills.map((skill) => (
                       <span
