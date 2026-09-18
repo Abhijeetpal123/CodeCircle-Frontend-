@@ -7,9 +7,12 @@ import {
   FileText,
   Sparkles,
   Trash2,
+  Camera,
+  X,
 } from "lucide-react";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
+const MAX_FILE_SIZE_MB = 5;
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -19,12 +22,23 @@ export default function Profile() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [removeError, setRemoveError] = useState(null);
+  const [isPhotoOpen, setIsPhotoOpen] = useState(false);
+
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:7777/profile/view", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "http://localhost:7777/profile/view",
+          {
+            withCredentials: true,
+          },
+        );
 
         console.log(response.data);
         setProfile(response.data);
@@ -41,19 +55,125 @@ export default function Profile() {
     getProfile();
   }, []);
 
-  // BUG FIX: Added (editProfile.education || []) to prevent crash if undefined
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  
+  useEffect(() => {
+    if (!isPhotoOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setIsPhotoOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [isPhotoOpen]);
+
+
   const updateEducationField = (index, field, value) => {
     const updatedEducation = [...(editProfile.education || [])];
     updatedEducation[index] = { ...updatedEducation[index], [field]: value };
     setEditProfile({ ...editProfile, education: updatedEducation });
   };
 
-  // BUG FIX: Added (editProfile.education || []) to prevent crash if undefined
   const removeEducation = (index) => {
     const updatedEducation = (editProfile.education || []).filter(
       (_, i) => i !== index,
     );
     setEditProfile({ ...editProfile, education: updatedEducation });
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please choose an image file.");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+      setUploadError(`Image must be under ${MAX_FILE_SIZE_MB}MB.`);
+      return;
+    }
+
+    setUploadError(null);
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const cancelPhotoSelection = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setUploadError(null);
+  };
+
+  const handleProfilePhotoUpload = async () => {
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append("profilePic", selectedFile);
+
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const response = await axios.patch(
+        "http://localhost:7777/profile/photo",
+        formData,
+        {
+          withCredentials: true,
+        },
+      );
+
+  
+      setProfile((prevProfile) => ({
+        ...prevProfile,
+        profilePic: response.data.profilePic,
+      }));
+
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      setUploadError(
+        err.response?.data?.message ||
+          err.response?.data ||
+          "Couldn't upload your photo. Try again.",
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    const confirmRemove = window.confirm("Remove your profile photo?");
+    if (!confirmRemove) return;
+
+    setRemoveError(null);
+    setIsRemoving(true);
+    try {
+      await axios.delete("http://localhost:7777/profile/photo", {
+        withCredentials: true,
+      });
+      setProfile((prev) => ({ ...prev, profilePic: null }));
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      setRemoveError(
+        err.response?.data?.message ||
+          err.response?.data ||
+          "Couldn't remove your photo.",
+      );
+    } finally {
+      setIsRemoving(false);
+    }
   };
 
   const handleSave = async () => {
@@ -103,6 +223,9 @@ export default function Profile() {
   }
 
   const avatarColor = avatarColors[0];
+  const displayImageSrc =
+    previewUrl ||
+    (profile?.profilePic ? `http://localhost:7777${profile.profilePic}` : null);
 
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">
@@ -127,17 +250,91 @@ export default function Profile() {
             </div>
           )}
 
-          {/* Avatar */}
-          <div
-            className="mx-auto flex h-24 w-24 items-center justify-center rounded-full text-2xl font-bold text-white"
-            style={{ backgroundColor: avatarColor }}
-          >
-            {profile.firstName?.[0]}
-            {profile.lastName?.[0]}
+          <div className="flex flex-col items-center">
+            <div className="group relative">
+              {displayImageSrc ? (
+                <button
+                  type="button"
+                  onClick={() => setIsPhotoOpen(true)}
+                  aria-label="View photo"
+                  className="block h-28 w-28 overflow-hidden rounded-full border-4 border-white shadow-lg transition duration-200 group-hover:ring-4 group-hover:ring-[#EAE1D3]"
+                >
+                  <img
+                    src={displayImageSrc}
+                    alt={`${profile?.firstName} ${profile?.lastName}`}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+              ) : (
+                <div
+                  className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-white text-3xl font-bold text-white shadow-lg transition duration-200 group-hover:ring-4 group-hover:ring-[#EAE1D3]"
+                  style={{ backgroundColor: avatarColor }}
+                >
+                  {profile?.firstName?.[0]}
+                  {profile?.lastName?.[0]}
+                </div>
+              )}
+
+              <label
+                aria-label="Change profile photo"
+                className="absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-[3px] border-white bg-[#5B8C6E] text-white shadow-md transition-transform hover:scale-105 hover:bg-[#4A7359]"
+              >
+                <Camera className="h-4 w-4" />
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+              </label>
+            </div>
+
+            {(uploadError || removeError) && (
+              <p className="mt-4 text-xs font-medium text-[#C4483D]">
+                {uploadError || removeError}
+              </p>
+            )}
+
+            {selectedFile ? (
+              <div className="mt-5 flex items-center gap-2 rounded-full border border-[#EAE1D3] bg-[#FBF6EF] p-1.5 shadow-sm">
+                <button
+                  onClick={cancelPhotoSelection}
+                  disabled={uploading}
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold text-[#8A8178] transition hover:bg-[#EAE1D3] hover:text-[#2B2A28] disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleProfilePhotoUpload}
+                  disabled={uploading}
+                  className="flex items-center gap-1.5 rounded-full bg-[#E8624F] px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Uploading…
+                    </>
+                  ) : (
+                    "Save photo"
+                  )}
+                </button>
+              </div>
+            ) : profile?.profilePic ? (
+              <button
+                onClick={handleRemovePhoto}
+                disabled={isRemoving}
+                className="mt-4 flex items-center gap-1.5 text-xs font-medium text-[#8A8178] transition hover:text-[#C4483D] disabled:opacity-50"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                {isRemoving ? "Removing..." : "Remove photo"}
+              </button>
+            ) : (
+              <div className="h-8"></div> /* Spacer so layout doesn't jump */
+            )}
           </div>
 
           {/* Name + age */}
-          <div className="mt-5 text-center">
+          <div className="mt-4 text-center">
             {isEditing ? (
               <div className="grid grid-cols-2 gap-3 text-left">
                 <label className="flex flex-col gap-1.5 text-xs font-medium text-[#8A8178]">
@@ -513,10 +710,10 @@ export default function Profile() {
               onClick={() => {
                 setIsEditing(true);
                 // BUG FIX: Ensure arrays exist when entering edit mode
-                setEditProfile({ 
+                setEditProfile({
                   ...profile,
                   education: profile.education || [],
-                  skills: profile.skills || []
+                  skills: profile.skills || [],
                 });
               }}
               className="mt-8 w-full rounded-full bg-[#E8624F] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544]"
@@ -526,6 +723,28 @@ export default function Profile() {
           )}
         </div>
       </div>
+
+      {/* Fullscreen photo lightbox */}
+      {isPhotoOpen && displayImageSrc && (
+        <div
+          onClick={() => setIsPhotoOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#2B2A28]/90 p-4"
+        >
+          <button
+            onClick={() => setIsPhotoOpen(false)}
+            aria-label="Close"
+            className="absolute right-4 top-4 rounded-full p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <img
+            src={displayImageSrc}
+            alt={`${profile?.firstName} ${profile?.lastName}`}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[85vh] max-w-[90vw] rounded-2xl object-contain shadow-2xl"
+          />
+        </div>
+      )}
     </main>
   );
 }
