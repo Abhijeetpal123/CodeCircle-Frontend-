@@ -34,7 +34,7 @@ export default function Profile() {
     const getProfile = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:7777/profile/view",
+          "https://codecircle-nq5c.onrender.com/profile/view",
           {
             withCredentials: true,
           },
@@ -126,7 +126,7 @@ export default function Profile() {
     setUploading(true);
     try {
       const response = await axios.patch(
-        "http://localhost:7777/profile/photo",
+        "https://codecircle-nq5c.onrender.com/profile/photo",
         formData,
         {
           withCredentials: true,
@@ -160,7 +160,7 @@ export default function Profile() {
     setRemoveError(null);
     setIsRemoving(true);
     try {
-      await axios.delete("http://localhost:7777/profile/photo", {
+      await axios.delete("https://codecircle-nq5c.onrender.com/profile/photo", {
         withCredentials: true,
       });
       setProfile((prev) => ({ ...prev, profilePic: null }));
@@ -192,7 +192,7 @@ export default function Profile() {
 
       console.log("Sending to API:", updatedData);
 
-      await axios.patch("http://localhost:7777/profile/edit", updatedData, {
+      await axios.patch("https://codecircle-nq5c.onrender.com/profile/edit", updatedData, {
         withCredentials: true,
       });
 
@@ -225,7 +225,7 @@ export default function Profile() {
   const avatarColor = avatarColors[0];
   const displayImageSrc =
     previewUrl ||
-    (profile?.profilePic ? `http://localhost:7777${profile.profilePic}` : null);
+    (profile?.profilePic ? `https://codecircle-nq5c.onrender.com${profile.profilePic}` : null);
 
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">

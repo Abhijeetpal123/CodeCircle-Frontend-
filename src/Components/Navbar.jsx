@@ -14,7 +14,7 @@ export default function Navbar() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("http://localhost:7777/profile/view", {
+        const res = await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
           withCredentials: true,
         });
         console.log("AUTH SUCCESS:", res.data);
@@ -30,7 +30,7 @@ export default function Navbar() {
   const handleLogOut = async () => {
     try {
       await axios.post(
-        "http://localhost:7777/logout",
+        "https://codecircle-nq5c.onrender.com/logout",
         {},
         {
           withCredentials: true,

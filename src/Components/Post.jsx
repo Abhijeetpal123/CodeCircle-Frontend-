@@ -27,7 +27,7 @@ export default function Post() {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await axios.get("http://localhost:7777/post", {
+        const response = await axios.get("https://codecircle-nq5c.onrender.com/post", {
           withCredentials: true,
         });
 
@@ -47,7 +47,7 @@ export default function Post() {
     const getProfile = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:7777/profile/view",
+          "https://codecircle-nq5c.onrender.com/profile/view",
           { withCredentials: true },
         );
 
@@ -69,7 +69,7 @@ export default function Post() {
     setIsPosting(true);
     try {
       const response = await axios.post(
-        "http://localhost:7777/post",
+        "https://codecircle-nq5c.onrender.com/post",
         { title, content },
         { withCredentials: true },
       );
@@ -137,7 +137,7 @@ export default function Post() {
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
   {currentUser?.profilePic ? (
     <img
-      src={`http://localhost:7777${currentUser.profilePic}`}
+      src={`https://codecircle-nq5c.onrender.com${currentUser.profilePic}`}
       alt={`${currentUser.firstName || ""} ${currentUser.lastName || ""}`}
       className="h-full w-full object-cover"
     />

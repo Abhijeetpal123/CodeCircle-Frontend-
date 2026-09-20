@@ -43,7 +43,7 @@ export default function PostCard({
     setIsSaving(true);
     try {
       const response = await axios.patch(
-        `http://localhost:7777/post/${post._id}`,
+        `https://codecircle-nq5c.onrender.com/post/${post._id}`,
         {
           title: editTitle,
           content: editContent,
@@ -74,7 +74,7 @@ export default function PostCard({
     setIsDeleting(true);
     try {
       const response = await axios.delete(
-        `http://localhost:7777/post/${post._id}`,
+        `https://codecircle-nq5c.onrender.com/post/${post._id}`,
         {
           withCredentials: true,
         },
@@ -139,7 +139,7 @@ export default function PostCard({
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                 {post.createdBy?.profilePic ? (
                   <img
-                    src={`http://localhost:7777${post.createdBy.profilePic}`}
+                    src={`https://codecircle-nq5c.onrender.com${post.createdBy.profilePic}`}
                     alt={`${post.createdBy?.firstName || ""} ${post.createdBy?.lastName || ""}`}
                     className="h-full w-full object-cover"
                   />

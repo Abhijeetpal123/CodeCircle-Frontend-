@@ -15,7 +15,7 @@ export default function UserProfile() {
     const getUserProfile = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7777/user/${userId}`,
+          `https://codecircle-nq5c.onrender.com/user/${userId}`,
           {
             withCredentials: true,
           },

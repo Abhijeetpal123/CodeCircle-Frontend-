@@ -29,7 +29,7 @@ const getProfileImageUrl = (profilePic) => {
     return profilePic;
   }
 
-  return `http://localhost:7777${profilePic}`;
+  return `https://codecircle-nq5c.onrender.com${profilePic}`;
 };
 
 
@@ -350,7 +350,7 @@ export default function Chat() {
       try {
         console.log("1. PROFILE REQUEST START");
 
-        const response = await axios.get("http://localhost:7777/profile/view", {
+        const response = await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
           withCredentials: true,
         });
 
@@ -369,7 +369,7 @@ export default function Chat() {
     const getTargetUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7777/user/${targetUserID}`,
+          `https://codecircle-nq5c.onrender.com/user/${targetUserID}`,
           { withCredentials: true },
         );
         setTargetUser(response.data.data || response.data);
@@ -421,7 +421,7 @@ export default function Chat() {
     setIsLoadingHistory(true);
     try {
       const response = await axios.get(
-        `http://localhost:7777/chat/${targetUserID}`,
+        `https://codecircle-nq5c.onrender.com/chat/${targetUserID}`,
         {
           withCredentials: true,
         },

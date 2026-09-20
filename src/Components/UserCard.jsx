@@ -44,7 +44,7 @@ export default function UserCard({
             src={
               user.profilePic.startsWith("http")
                 ? user.profilePic
-                : `http://localhost:7777${user.profilePic}`
+                : `https://codecircle-nq5c.onrender.com${user.profilePic}`
             }
             alt={`${user.firstName} ${user.lastName}`}
             className="h-14 w-14 rounded-full border-2 object-cover shadow-sm"

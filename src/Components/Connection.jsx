@@ -15,7 +15,7 @@ export default function Connection() {
         setIsLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:7777/user/connections",
+          "https://codecircle-nq5c.onrender.com/user/connections",
           { withCredentials: true }
         );
         setConnections(response.data.data || []);

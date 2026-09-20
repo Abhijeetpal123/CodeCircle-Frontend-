@@ -15,7 +15,7 @@ export default function Request() {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "http://localhost:7777/user/request/received",
+          "https://codecircle-nq5c.onrender.com/user/request/received",
           { withCredentials: true }
         );
         setRequests(response.data.data || []);
@@ -32,7 +32,7 @@ export default function Request() {
     setReviewLoading(requestId);
     try {
       await axios.post(
-        `http://localhost:7777/request/review/${status}/${requestId}`,
+        `https://codecircle-nq5c.onrender.com/request/review/${status}/${requestId}`,
         {},
         { withCredentials: true }
       );

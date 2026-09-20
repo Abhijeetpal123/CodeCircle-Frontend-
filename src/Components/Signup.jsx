@@ -58,7 +58,7 @@ export default function Signup() {
     setIsSubmitting(true);
     try {
       await axios.post(
-        "http://localhost:7777/signup",
+        "https://codecircle-nq5c.onrender.com/signup",
         {
           firstName: formData.firstName,
           lastName: formData.lastName,

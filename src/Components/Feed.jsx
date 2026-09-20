@@ -23,7 +23,7 @@ export default function Feed() {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          `http://localhost:7777/user/feed?page=1&limit=12&search=${debouncedSearch}`,
+          `https://codecircle-nq5c.onrender.com/user/feed?page=1&limit=12&search=${debouncedSearch}`,
           { withCredentials: true }
         );
         setUsers(response.data.data || []);
@@ -40,7 +40,7 @@ export default function Feed() {
   try {
     setRequestLoading(toUserId);
     await axios.post(
-      `http://localhost:7777/request/send/${status}/${toUserId}`,
+      `https://codecircle-nq5c.onrender.com/request/send/${status}/${toUserId}`,
       {},
       { withCredentials: true }
     );

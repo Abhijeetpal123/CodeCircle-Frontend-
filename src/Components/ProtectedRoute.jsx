@@ -9,7 +9,7 @@ export default function ProtectedRoute({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get("http://localhost:7777/profile/view", {
+        await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
           withCredentials: true,
         });
 
