@@ -64,11 +64,11 @@ export default function Request() {
 
       <div className="mx-auto mb-10 max-w-md text-center group">
         <div className="mb-2 flex items-center justify-center gap-3">
-          <h1 className="cursor-default text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
+          <h1 className="cursor-default text-3xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
             Connection Requests
           </h1>
           {requests.length > 0 && !loading && (
-            <span className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-[#E8624F] px-2 text-sm font-bold text-white shadow-md animate-bounce">
+            <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-[#E8624F] px-2 text-sm font-bold text-white shadow-md animate-bounce">
               {requests.length}
             </span>
           )}
@@ -88,7 +88,7 @@ export default function Request() {
       {loading && !error ? (
         <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex h-[320px] flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50">
+            <div key={i} className="flex h-80 flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50">
               <div className="shimmer-bg mx-auto h-16 w-16 rounded-full" />
               <div className="shimmer-bg mx-auto mt-4 h-4 w-3/4 rounded-full" />
               <div className="shimmer-bg mx-auto mt-2 h-3 w-1/2 rounded-full" />

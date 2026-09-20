@@ -54,11 +54,11 @@ export default function Connection() {
 
       <div className="mx-auto mb-6 max-w-md text-center group">
         <div className="mb-1 flex items-center justify-center gap-3">
-          <h1 className="cursor-default text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
+          <h1 className="cursor-default text-2xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
             Your Connections
           </h1>
           {connections.length > 0 && !isLoading && (
-            <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#5B8C6E] px-2 text-xs font-bold text-white shadow-md">
+            <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#5B8C6E] px-2 text-xs font-bold text-white shadow-md">
               {connections.length}
             </span>
           )}
@@ -80,7 +80,7 @@ export default function Connection() {
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="flex h-[320px] flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50"
+              className="flex h-80 flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50"
             >
               <div className="shimmer-bg mx-auto h-16 w-16 rounded-full" />
               <div className="shimmer-bg mx-auto mt-4 h-4 w-3/4 rounded-full" />
@@ -97,7 +97,7 @@ export default function Connection() {
         </div>
       ) : !error && connections.length === 0 ? (
         <div className="mx-auto mt-16 flex max-w-sm flex-col items-center justify-center rounded-3xl border border-[#EAE1D3]/80 bg-white p-10 text-center shadow-xl shadow-[#5B8C6E]/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group">
-          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-tr from-[#FBF6EF] to-[#EAE1D3] shadow-inner transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-tr from-[#FBF6EF] to-[#EAE1D3] shadow-inner transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
             <Users className="h-10 w-10 text-[#8A8178] transition-colors duration-300 group-hover:text-[#5B8C6E]" />
           </div>
           <h3 className="mt-6 text-xl font-bold text-[#2B2A28]">No connections yet</h3>

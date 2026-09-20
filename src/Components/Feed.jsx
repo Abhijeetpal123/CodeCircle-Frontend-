@@ -82,7 +82,7 @@ export default function Feed() {
       `}</style>
 
       <div className="mx-auto mb-10 max-w-md text-center group">
-        <h1 className="cursor-default text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
+        <h1 className="cursor-default text-3xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
           Discover Developers
         </h1>
         <p className="mt-2 text-sm text-[#756F68] transition-colors duration-300 group-hover:text-[#2B2A28]">
@@ -120,7 +120,7 @@ export default function Feed() {
       {loading && !error ? (
         <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="flex h-[320px] flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50">
+            <div key={i} className="flex h-80 flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50">
               <div className="shimmer-bg mx-auto h-16 w-16 rounded-full" />
               <div className="shimmer-bg mx-auto mt-4 h-4 w-3/4 rounded-full" />
               <div className="shimmer-bg mx-auto mt-2 h-3 w-1/2 rounded-full" />
