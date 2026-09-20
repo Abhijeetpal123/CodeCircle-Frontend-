@@ -134,13 +134,23 @@ export default function Post() {
           )}
 
           <div className="flex gap-3">
-            <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-              style={{ backgroundColor: composerColor }}
-            >
-              {currentUser?.firstName?.[0]}
-              {currentUser?.lastName?.[0]}
-            </div>
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+  {currentUser?.profilePic ? (
+    <img
+      src={`http://localhost:7777${currentUser.profilePic}`}
+      alt={`${currentUser.firstName || ""} ${currentUser.lastName || ""}`}
+      className="h-full w-full object-cover"
+    />
+  ) : (
+    <div
+      className="flex h-full w-full items-center justify-center rounded-full text-sm font-bold text-white"
+      style={{ backgroundColor: composerColor }}
+    >
+      {currentUser?.firstName?.[0]}
+      {currentUser?.lastName?.[0]}
+    </div>
+  )}
+</div>
 
             <div className="flex-1 space-y-3">
               <input

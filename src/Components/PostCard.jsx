@@ -136,12 +136,22 @@ export default function PostCard({
         <div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white"
-                style={{ backgroundColor: color }}
-              >
-                {post.createdBy?.firstName?.[0]}
-                {post.createdBy?.lastName?.[0]}
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                {post.createdBy?.profilePic ? (
+                  <img
+                    src={`http://localhost:7777${post.createdBy.profilePic}`}
+                    alt={`${post.createdBy?.firstName || ""} ${post.createdBy?.lastName || ""}`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="flex h-full w-full items-center justify-center rounded-full text-sm font-bold text-white"
+                    style={{ backgroundColor: color }}
+                  >
+                    {post.createdBy?.firstName?.[0]}
+                    {post.createdBy?.lastName?.[0]}
+                  </div>
+                )}
               </div>
               <div>
                 <p className="text-sm font-bold text-[#2B2A28]">

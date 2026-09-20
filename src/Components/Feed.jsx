@@ -167,14 +167,27 @@ export default function Feed() {
                 {/* =================================
                     AVATAR (Reduced to h-16 w-16)
                 ================================= */}
-                <div
-                  className="mx-auto mb-3 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
-                  style={{
-                    backgroundColor: avatarColors[i % avatarColors.length],
-                  }}
-                >
-                  {user.firstName?.[0]}
-                  {user.lastName?.[0]}
+                {/* =================================
+    AVATAR
+================================= */}
+                <div className="mx-auto mb-3">
+                  {user.profilePic ? (
+                    <img
+                      src={`http://localhost:7777${user.profilePic}`}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-sm"
+                    />
+                  ) : (
+                    <div
+                      className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
+                      style={{
+                        backgroundColor: avatarColors[i % avatarColors.length],
+                      }}
+                    >
+                      {user.firstName?.[0]}
+                      {user.lastName?.[0]}
+                    </div>
+                  )}
                 </div>
 
                 {/* =================================
@@ -221,7 +234,7 @@ export default function Feed() {
 
                 {/* =================================
                     BOTTOM ACTIONS
-                    mt-auto pins this block strictly to the bottom
+                   
                 ================================= */}
                 <div className="mt-auto flex flex-col pt-5">
                   {/* =================================
@@ -295,7 +308,9 @@ export default function Feed() {
                         disabled:opacity-50
                       "
                     >
-                      {requestLoading === user._id ? "Sending..." : "Interested"}
+                      {requestLoading === user._id
+                        ? "Sending..."
+                        : "Interested"}
                     </button>
                   </div>
                 </div>

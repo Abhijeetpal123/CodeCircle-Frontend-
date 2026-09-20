@@ -67,7 +67,7 @@ export default function Signup() {
         },
         { withCredentials: true },
       );
-      navigate("/"); // send them wherever a logged-in user should land
+      navigate("/feed"); // send them wherever a logged-in user should land
     } catch (err) {
       setError(
         err.response?.data?.message ||

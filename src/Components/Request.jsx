@@ -45,7 +45,6 @@ export default function Request() {
 
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">
-      
       {/* =================================
           PAGE HEADER
       ================================= */}
@@ -103,17 +102,28 @@ export default function Request() {
                 {/* =================================
                     AVATAR
                 ================================= */}
+                {/* =================================
+    AVATAR
+================================= */}
                 <div className="relative mx-auto mb-3 h-16 w-16 shrink-0">
-                  <div
-                    className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
-                    style={{
-                      backgroundColor: color,
-                      boxShadow: `0 0 0 4px ${color}26`,
-                    }}
-                  >
-                    {user.firstName?.[0]}
-                    {user.lastName?.[0]}
-                  </div>
+                  {user.profilePic ? (
+                    <img
+                      src={`http://localhost:7777${user.profilePic}`}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-sm"
+                    />
+                  ) : (
+                    <div
+                      className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
+                      style={{
+                        backgroundColor: color,
+                        boxShadow: `0 0 0 4px ${color}26`,
+                      }}
+                    >
+                      {user.firstName?.[0]}
+                      {user.lastName?.[0]}
+                    </div>
+                  )}
                 </div>
 
                 {/* =================================
@@ -163,9 +173,8 @@ export default function Request() {
                     mt-auto pins this block to the bottom
                 ================================= */}
                 <div className="mt-auto flex flex-col pt-5">
-                  
                   {/* VIEW PROFILE */}
-                  <Link 
+                  <Link
                     to={`/user/${user._id}`}
                     className="
                       mb-3
@@ -234,7 +243,6 @@ export default function Request() {
                     </button>
                   </div>
                 </div>
-
               </div>
             );
           })}

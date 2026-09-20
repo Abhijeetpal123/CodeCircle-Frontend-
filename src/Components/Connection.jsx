@@ -4,7 +4,15 @@ import { Check } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
+const getProfileImageUrl = (profilePic) => {
+  if (!profilePic) return null;
 
+  if (profilePic.startsWith("http")) {
+    return profilePic;
+  }
+
+  return `http://localhost:7777${profilePic}`;
+};
 export default function Connection() {
   const [connections, setConnections] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,14 +27,20 @@ export default function Connection() {
             withCredentials: true,
           },
         );
-        console.log(response.data);
+        console.log(
+          "PROFILE PICS:",
+          response.data.data.map((connection) => ({
+            name: `${connection.firstName} ${connection.lastName}`,
+            profilePic: connection.profilePic,
+          })),
+        );
         setConnections(response.data.data);
       } catch (err) {
         console.error(err.response?.data || err.message);
         setError(
           err.response?.data?.message ||
-          err.response?.data ||
-          "Couldn't load your connections.",
+            err.response?.data ||
+            "Couldn't load your connections.",
         );
       } finally {
         setIsLoading(false);
@@ -81,37 +95,45 @@ export default function Connection() {
                 "
               >
                 {/* =================================
-                    AVATAR 
-                ================================= */}
+    AVATAR
+================================= */}
                 <div className="relative mx-auto mb-3 h-16 w-16 shrink-0">
-                  <div
-                    className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
-                    style={{
-                      backgroundColor: color,
-                      boxShadow: `0 0 0 4px ${color}26`,
-                    }}
-                  >
-                    {connection.firstName?.[0]}
-                    {connection.lastName?.[0]}
-                  </div>
+                  {getProfileImageUrl(connection.profilePic) ? (
+                    <img
+                      src={getProfileImageUrl(connection.profilePic)}
+                      alt={`${connection.firstName} ${connection.lastName}`}
+                      className="h-16 w-16 rounded-full border-2 border-white object-cover shadow-sm"
+                    />
+                  ) : (
+                    <div
+                      className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
+                      style={{
+                        backgroundColor: color,
+                        boxShadow: `0 0 0 4px ${color}26`,
+                      }}
+                    >
+                      {connection.firstName?.[0]}
+                      {connection.lastName?.[0]}
+                    </div>
+                  )}
+
                   <span
-                    className="absolute -right-0.5 -bottom-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#5B8C6E] text-white"
+                    className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-[#5B8C6E] text-white"
                     title="Connected"
                   >
                     <Check className="h-3 w-3" />
                   </span>
                 </div>
-
-                {/* =================================
+                {/* 
                     USER NAME
-                ================================= */}
+                */}
                 <h3 className="flex items-center justify-center text-base font-bold text-[#2B2A28]">
                   {connection.firstName} {connection.lastName}
                 </h3>
 
-                {/* =================================
+                {/* 
                     STATUS 
-                ================================= */}
+                */}
                 <p className="mt-0.5 flex items-center justify-center text-[11px] font-semibold uppercase tracking-wide text-[#5B8C6E]">
                   Connected
                 </p>
@@ -151,7 +173,8 @@ export default function Connection() {
                 ================================= */}
                 <div className="mt-auto flex flex-col pt-5">
                   <Link to={"/chat/" + connection._id} className="w-full">
-                    <button className="
+                    <button
+                      className="
                       w-full
                       cursor-pointer
                       rounded-full
@@ -165,7 +188,8 @@ export default function Connection() {
                       shadow-[#5B8C6E]/20
                       transition
                       hover:bg-[#4A7359]
-                    ">
+                    "
+                    >
                       Message
                     </button>
                   </Link>

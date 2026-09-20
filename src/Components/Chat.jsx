@@ -22,7 +22,16 @@ const formatLastSeen = (timestamp) => {
   return new Date(timestamp).toLocaleDateString();
 };
 
-// ---- local UI pieces, all in this one file ----
+const getProfileImageUrl = (profilePic) => {
+  if (!profilePic) return null;
+
+  if (profilePic.startsWith("http")) {
+    return profilePic;
+  }
+
+  return `http://localhost:7777${profilePic}`;
+};
+
 
 function ChatHeader({ targetUser, targetUserID, onBack }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -48,10 +57,20 @@ function ChatHeader({ targetUser, targetUserID, onBack }) {
           className="flex items-center gap-3 text-left transition-opacity hover:opacity-80 focus:outline-none"
         >
           {/* Avatar based on image_8c2408.png */}
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#5B8C6E] text-lg font-bold text-white uppercase tracking-wide">
-            {targetUser?.firstName?.[0] || ""}
-            {targetUser?.lastName?.[0] || ""}
-          </div>
+         <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-white shadow-sm">
+  {getProfileImageUrl(targetUser?.profilePic) ? (
+    <img
+      src={getProfileImageUrl(targetUser.profilePic)}
+      alt={`${targetUser?.firstName || ""} ${targetUser?.lastName || ""}`}
+      className="h-full w-full object-cover"
+    />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center bg-[#5B8C6E] text-lg font-bold uppercase tracking-wide text-white">
+      {targetUser?.firstName?.[0] || ""}
+      {targetUser?.lastName?.[0] || ""}
+    </div>
+  )}
+</div>
 
           <div className="min-w-0">
             <p className="truncate text-base font-bold text-[#2B2A28] capitalize tracking-tight">
@@ -131,12 +150,32 @@ function ChatHeader({ targetUser, targetUserID, onBack }) {
   );
 }
 
-function MessageBubble({ message, isOwn }) {
+function MessageBubble({ message, isOwn, profilePic }) {
   return (
-    <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+    <div
+      className={`flex items-end gap-2 ${
+        isOwn ? "justify-end" : "justify-start"
+      }`}
+    >
+      {!isOwn && (
+        <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+          {getProfileImageUrl(profilePic) ? (
+            <img
+              src={getProfileImageUrl(profilePic)}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-[#5B8C6E] text-xs font-bold text-white">
+              ?
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="max-w-[85%] md:max-w-[70%]">
         <div
-          className={`px-4 py-2.5 text-[15px] leading-relaxed shadow-sm wrap-break- whitespace-pre-wrap ${
+          className={`px-4 py-2.5 text-[15px] leading-relaxed shadow-sm whitespace-pre-wrap ${
             isOwn
               ? "rounded-2xl rounded-br-sm bg-[#5B8C6E] text-white"
               : "rounded-2xl rounded-bl-sm border border-[#EAE1D3] bg-white text-[#2B2A28]"
@@ -147,7 +186,7 @@ function MessageBubble({ message, isOwn }) {
 
         {message.createdAt && (
           <p
-            className={`mt-1 text-[11px] text-[#8A8178] mx-1 ${
+            className={`mx-1 mt-1 text-[11px] text-[#8A8178] ${
               isOwn ? "text-right" : "text-left"
             }`}
           >
@@ -158,11 +197,33 @@ function MessageBubble({ message, isOwn }) {
           </p>
         )}
       </div>
+
+      {isOwn && (
+        <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full">
+          {getProfileImageUrl(profilePic) ? (
+            <img
+              src={getProfileImageUrl(profilePic)}
+              alt=""
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-[#E8624F] text-xs font-bold text-white">
+              You
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function MessageList({ messages, currentUserId, isLoading, error, onRetry }) {
+function MessageList({ messages,
+  currentUserId,
+  currentUser,
+  targetUser,
+  isLoading,
+  error,
+  onRetry, }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -211,13 +272,22 @@ function MessageList({ messages, currentUserId, isLoading, error, onRetry }) {
 
   return (
     <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6 bg-white">
-      {messages.map((msg, index) => (
-        <MessageBubble
-          key={msg._id || index}
-          message={msg}
-          isOwn={msg.senderId === currentUserId}
-        />
-      ))}
+      {messages.map((msg, index) => {
+  const isOwn = String(msg.senderId) === String(currentUserId);
+
+  const profilePic = isOwn
+    ? currentUser?.profilePic
+    : targetUser?.profilePic;
+
+  return (
+    <MessageBubble
+      key={msg._id || index}
+      message={msg}
+      isOwn={isOwn}
+      profilePic={profilePic}
+    />
+  );
+})}
       <div ref={bottomRef} />
     </div>
   );
@@ -389,13 +459,15 @@ export default function Chat() {
         onBack={() => navigate(-1)}
       />
 
-      <MessageList
-        messages={messages}
-        currentUserId={currentUsers?._id}
-        isLoading={isLoadingHistory}
-        error={historyError}
-        onRetry={getChatHistory}
-      />
+     <MessageList
+  messages={messages}
+  currentUserId={currentUsers?._id}
+  currentUser={currentUsers}
+  targetUser={targetUser}
+  isLoading={isLoadingHistory}
+  error={historyError}
+  onRetry={getChatHistory}
+/>
 
       <ChatInput
         message={message}
