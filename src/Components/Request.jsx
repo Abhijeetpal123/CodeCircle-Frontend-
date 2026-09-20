@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-
-const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
+import { UserCheck, AlertCircle, Inbox } from "lucide-react";
+import UserCard from "./UserCard";
 
 export default function Request() {
   const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [reviewLoading, setReviewLoading] = useState(null);
 
   useEffect(() => {
     const getRequest = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const response = await axios.get(
           "http://localhost:7777/user/request/received",
-          { withCredentials: true },
+          { withCredentials: true }
         );
-        console.log(response.data);
-        setRequests(response.data.data);
+        setRequests(response.data.data || []);
       } catch (err) {
-        console.error(err.response?.data || err.message);
+        setError("Failed to load connection requests.");
+      } finally {
+        setLoading(false);
       }
     };
     getRequest();
@@ -30,219 +34,119 @@ export default function Request() {
       await axios.post(
         `http://localhost:7777/request/review/${status}/${requestId}`,
         {},
-        { withCredentials: true },
+        { withCredentials: true }
       );
-
-      setRequests((previousRequests) =>
-        previousRequests.filter((request) => request._id !== requestId),
-      );
+      setRequests((prev) => prev.filter((req) => req._id !== requestId));
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      alert("Something went wrong. Please try again.");
     } finally {
       setReviewLoading(null);
     }
   };
 
   return (
-    <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">
-      {/* =================================
-          PAGE HEADER
-      ================================= */}
-      <div className="mx-auto mb-10 max-w-md text-center">
-        <div className="mb-2 flex items-center justify-center gap-2">
-          <h1 className="text-2xl font-bold text-[#2B2A28]">
+    <main className="min-h-screen bg-[#FBF6EF] px-4 py-6 font-sans">
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+        .shimmer-bg {
+          background: linear-gradient(90deg, #EAE1D3 0%, #FBF6EF 50%, #EAE1D3 100%);
+          background-size: 800px 100%;
+          animation: shimmer 1.4s infinite linear;
+        }
+      `}</style>
+
+      <div className="mx-auto mb-10 max-w-md text-center group">
+        <div className="mb-2 flex items-center justify-center gap-3">
+          <h1 className="cursor-default text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
             Connection Requests
           </h1>
-          {requests.length > 0 && (
-            <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#E8624F] px-1.5 text-xs font-bold text-white shadow-sm">
+          {requests.length > 0 && !loading && (
+            <span className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-[#E8624F] px-2 text-sm font-bold text-white shadow-md animate-bounce">
               {requests.length}
             </span>
           )}
         </div>
-        <p className="text-sm text-[#756F68]">
-          Review people who want to connect with you.
+        <p className="mt-2 text-sm text-[#756F68]">
+          Review people who want to connect and collaborate with you.
         </p>
       </div>
 
-      {requests.length === 0 ? (
-        /* =================================
-            EMPTY STATE
-        ================================= */
-        <p className="text-center text-sm text-[#8A8178]">
-          No pending requests right now — you're all caught up.
-        </p>
+      {error && (
+        <div className="mx-auto flex max-w-md flex-col items-center justify-center rounded-xl border border-[#C4483D]/20 bg-[#C4483D]/5 p-6 text-[#C4483D]">
+          <AlertCircle className="mb-2 h-8 w-8 animate-bounce" />
+          <p className="text-sm font-medium">{error}</p>
+        </div>
+      )}
+
+      {loading && !error ? (
+        <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex h-[320px] flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50">
+              <div className="shimmer-bg mx-auto h-16 w-16 rounded-full" />
+              <div className="shimmer-bg mx-auto mt-4 h-4 w-3/4 rounded-full" />
+              <div className="shimmer-bg mx-auto mt-2 h-3 w-1/2 rounded-full" />
+              <div className="mt-6 space-y-2">
+                <div className="shimmer-bg h-3 w-full rounded-full" />
+                <div className="shimmer-bg h-3 w-5/6 rounded-full" />
+              </div>
+              <div className="mt-auto flex gap-2 pt-5">
+                <div className="shimmer-bg h-10 flex-1 rounded-xl" />
+                <div className="shimmer-bg h-10 flex-1 rounded-xl" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : !error && requests.length === 0 ? (
+        <div className="mx-auto mt-16 flex max-w-sm flex-col items-center justify-center rounded-3xl border border-[#EAE1D3]/80 bg-white p-10 text-center shadow-xl shadow-[#5B8C6E]/5 transition-all duration-500 hover:-translate-y-2">
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-tr from-[#FBF6EF] to-[#EAE1D3] shadow-inner">
+            <Inbox className="h-10 w-10 text-[#8A8178]" />
+          </div>
+          <h3 className="mt-6 text-xl font-bold text-[#2B2A28]">Inbox Zero</h3>
+          <p className="mt-2 text-[13px] text-[#756F68] leading-relaxed">
+            No pending requests right now — you're all caught up.
+          </p>
+        </div>
       ) : (
-        /* =================================
-            REQUEST GRID (Uniform sizing)
-        ================================= */
-        <div className="mx-auto grid max-w-5xl items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {requests.map((request, i) => {
-            const color = avatarColors[i % avatarColors.length];
-            const user = request.fromUserId;
-            const skills = user.skills || [];
-            const visibleSkills = skills.slice(0, 4);
-            const extraSkillsCount = skills.length - visibleSkills.length;
+            const isActionLoading = reviewLoading === request._id;
 
             return (
               <div
                 key={request._id}
-                className="
-                  flex h-full flex-col
-                  rounded-2xl
-                  bg-white
-                  p-5
-                  text-center
-                  shadow-lg shadow-[#E8624F]/5
-                  border border-[#EAE1D3]/50
-                  transition
-                  hover:-translate-y-1
-                  hover:shadow-xl hover:shadow-[#E8624F]/10
-                "
+                style={{
+                  animation: "fadeInUp 0.5s ease-out both",
+                  animationDelay: `${i * 70}ms`,
+                }}
               >
-                {/* =================================
-                    AVATAR
-                ================================= */}
-                {/* =================================
-    AVATAR
-================================= */}
-                <div className="relative mx-auto mb-3 h-16 w-16 shrink-0">
-                  {user.profilePic ? (
-                    <img
-                      src={`http://localhost:7777${user.profilePic}`}
-                      alt={`${user.firstName} ${user.lastName}`}
-                      className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-sm"
-                    />
-                  ) : (
-                    <div
-                      className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
-                      style={{
-                        backgroundColor: color,
-                        boxShadow: `0 0 0 4px ${color}26`,
-                      }}
-                    >
-                      {user.firstName?.[0]}
-                      {user.lastName?.[0]}
-                    </div>
-                  )}
-                </div>
-
-                {/* =================================
-                    USER NAME
-                ================================= */}
-                <h3 className="flex items-center justify-center text-base font-bold text-[#2B2A28]">
-                  {user.firstName} {user.lastName}
-                </h3>
-
-                {/* =================================
-                    STATUS 
-                ================================= */}
-                <p className="mt-0.5 flex items-center justify-center text-[11px] font-semibold uppercase tracking-wide text-[#E8624F]">
-                  Wants to connect
-                </p>
-
-                {/* =================================
-                    ABOUT (Fixed min-height)
-                ================================= */}
-                <p className="mt-3 min-h-10 text-[13px] leading-5 text-[#756F68] line-clamp-2">
-                  {user.about || "This developer hasn't added an About yet."}
-                </p>
-
-                {/* =================================
-                    SKILLS (Fixed min-height)
-                ================================= */}
-                <div className="mt-3 min-h-7">
-                  <div className="flex flex-wrap justify-center gap-1.5">
-                    {visibleSkills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="rounded-full bg-[#FBF6EF] border border-[#EAE1D3] px-2 py-0.5 text-[11px] font-medium text-[#5B8C6E]"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    {extraSkillsCount > 0 && (
-                      <span className="rounded-full bg-[#FBF6EF] border border-[#EAE1D3] px-2 py-0.5 text-[11px] font-medium text-[#8A8178]">
-                        +{extraSkillsCount}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* =================================
-                    BOTTOM ACTIONS
-                    mt-auto pins this block to the bottom
-                ================================= */}
-                <div className="mt-auto flex flex-col pt-5">
-                  {/* VIEW PROFILE */}
-                  <Link
-                    to={`/user/${user._id}`}
-                    className="
-                      mb-3
-                      inline-flex
-                      items-center
-                      justify-center
-                      text-[13px]
-                      font-bold
-                      text-[#5B8C6E]
-                      transition
-                      hover:text-[#4A7359]
-                      hover:underline
-                    "
+                <UserCard 
+                  user={request.fromUserId} 
+                  index={i} 
+                  statusText="Wants to connect"
+                  statusColor="#E8624F"
+                >
+                  <button
+                    disabled={isActionLoading}
+                    onClick={() => handleReview("rejected", request._id)}
+                    className="flex-1 rounded-xl border border-[#EAE1D3] px-3 py-2.5 text-[13px] font-semibold text-[#8A8178] transition-all hover:bg-red-50 hover:text-red-600 hover:border-red-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    View Profile →
-                  </Link>
-
-                  <div className="flex gap-2.5">
-                    {/* REJECT BUTTON */}
-                    <button
-                      disabled={reviewLoading === request._id}
-                      onClick={() => handleReview("rejected", request._id)}
-                      className="
-                        flex-1
-                        cursor-pointer
-                        rounded-full
-                        border
-                        border-[#EAE1D3]
-                        px-3
-                        py-2
-                        text-[13px]
-                        font-semibold
-                        text-[#8A8178]
-                        transition
-                        hover:bg-[#FBF6EF] hover:text-[#2B2A28]
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                      "
-                    >
-                      {reviewLoading === request._id ? "..." : "Reject"}
-                    </button>
-
-                    {/* ACCEPT BUTTON */}
-                    <button
-                      disabled={reviewLoading === request._id}
-                      onClick={() => handleReview("accepted", request._id)}
-                      className="
-                        flex-1
-                        cursor-pointer
-                        rounded-full
-                        bg-[#E8624F]
-                        px-3
-                        py-2
-                        text-[13px]
-                        font-semibold
-                        text-white
-                        shadow-sm
-                        shadow-[#E8624F]/20
-                        transition
-                        hover:bg-[#DA5544]
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                      "
-                    >
-                      {reviewLoading === request._id ? "Saving..." : "Accept"}
-                    </button>
-                  </div>
-                </div>
+                    {isActionLoading ? "..." : "Reject"}
+                  </button>
+                  <button
+                    disabled={isActionLoading}
+                    onClick={() => handleReview("accepted", request._id)}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-[#5B8C6E] px-3 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-[#4A7359] hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isActionLoading ? "Saving..." : <><UserCheck className="h-4 w-4" /> Accept</>}
+                  </button>
+                </UserCard>
               </div>
             );
           })}

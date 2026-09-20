@@ -11,10 +11,24 @@ import UserProfile from "./Components/UserProfile.jsx";
 import Home from "./Components/Home.jsx";
 import Post from "./Components/Post.jsx";
 import Chat from "./Components/Chat.jsx";
+import { Toaster } from "react-hot-toast";
 export default function App() {
   return (
     <>
       <BrowserRouter>
+        <Toaster
+          position="bottom-left"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: "#2B2A28",
+              color: "#fff",
+              borderRadius: "12px",
+              fontSize: "13px",
+              fontWeight: "500",
+            },
+          }}
+        />
         <Routes>
           <Route path="/" element={<Body />}>
             <Route path="/login" element={<Login />} />
@@ -52,19 +66,21 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/post"
-            element={
-              <ProtectedRoute>
-                <Post/>
-              </ProtectedRoute>
-            }
+            <Route
+              path="/post"
+              element={
+                <ProtectedRoute>
+                  <Post />
+                </ProtectedRoute>
+              }
             />
-            <Route path="/chat/:userId"
-            element={
-              <ProtectedRoute>
-                <Chat/>
-              </ProtectedRoute>
-            }
+            <Route
+              path="/chat/:userId"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
             />
           </Route>
           <Route

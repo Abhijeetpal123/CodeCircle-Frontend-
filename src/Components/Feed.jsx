@@ -1,121 +1,107 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Search, X } from "lucide-react";
-
-const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
+import { Search, X, Users, AlertCircle } from "lucide-react";
+import UserCard from "./UserCard";
+import toast from 'react-hot-toast';
 
 export default function Feed() {
-  // =========================
-  // STATES
-  // =========================
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [requestLoading, setRequestLoading] = useState(null);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const navigate = useNavigate();
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 500);
+    return () => clearTimeout(timer);
+  }, [search]);
 
-  // =========================
-  // FETCH DEVELOPER FEED
-  // =========================
   useEffect(() => {
     const getFeed = async () => {
       try {
         setLoading(true);
-
+        setError(null);
         const response = await axios.get(
-          `http://localhost:7777/user/feed?page=1&limit=10&search=${debouncedSearch}`,
-          {
-            withCredentials: true,
-          },
+          `http://localhost:7777/user/feed?page=1&limit=12&search=${debouncedSearch}`,
+          { withCredentials: true }
         );
-
-        setUsers(response.data.data);
+        setUsers(response.data.data || []);
       } catch (err) {
-        console.error(err.response?.data || err.message);
+        setError("Unable to load developers. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-
     getFeed();
   }, [debouncedSearch]);
 
-  // =========================
-  // SEND CONNECTION REQUEST
-  // =========================
   const handleRequest = async (status, toUserId) => {
-    try {
-      // Set loading for only the selected user
-      setRequestLoading(toUserId);
+  try {
+    setRequestLoading(toUserId);
+    await axios.post(
+      `http://localhost:7777/request/send/${status}/${toUserId}`,
+      {},
+      { withCredentials: true }
+    );
+    
+    // User ko list se hatao
+    setUsers((prev) => prev.filter((user) => user._id !== toUserId));
 
-      await axios.post(
-        `http://localhost:7777/request/send/${status}/${toUserId}`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
-
-      // Remove user after successful request
-      setUsers((previousUsers) =>
-        previousUsers.filter((user) => user._id !== toUserId),
-      );
-    } catch (err) {
-      console.error(err.response?.data || err.message);
-    } finally {
-      // Enable buttons again
-      setRequestLoading(null);
+    if (status === "interested") {
+      toast.success("Connection request sent!"); 
+    } else {
+      toast("User ignored", { icon: '👋' }); // Ignore ke liye normal toast
     }
-  };
 
-  // =========================
-  // SEARCH DEBOUNCE
-  // =========================
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [search]);
+  } catch (err) {
+    // Error aane par laal rang ka error toast aayega
+    toast.error("Failed to send request. Please try again.");
+  } finally {
+    setRequestLoading(null);
+  }
+};
 
   return (
-    <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">
-      {/* =================================
-          PAGE HEADER
-      ================================= */}
-      <div className="mx-auto mb-10 max-w-md text-center">
-        <h1 className="text-2xl font-bold text-[#2B2A28]">
+    <main className="min-h-screen bg-[#FBF6EF] px-4 py-6 font-sans">
+      {/* Custom keyframes to match Connection.jsx */}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -400px 0; }
+          100% { background-position: 400px 0; }
+        }
+        .shimmer-bg {
+          background: linear-gradient(90deg, #EAE1D3 0%, #FBF6EF 50%, #EAE1D3 100%);
+          background-size: 800px 100%;
+          animation: shimmer 1.4s infinite linear;
+        }
+      `}</style>
+
+      <div className="mx-auto mb-10 max-w-md text-center group">
+        <h1 className="cursor-default text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
           Discover Developers
         </h1>
-
-        <p className="mt-2 text-sm text-[#756F68]">
-          Find people to connect and collaborate with.
+        <p className="mt-2 text-sm text-[#756F68] transition-colors duration-300 group-hover:text-[#2B2A28]">
+          Find the right people to connect and collaborate with.
         </p>
 
-        {/* =================================
-            SEARCH
-        ================================= */}
-        <div className="relative mt-6">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8A8178]" />
-
+        <div className="relative mt-6 shadow-sm rounded-full transition-shadow duration-300 focus-within:shadow-lg focus-within:shadow-[#5B8C6E]/20">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8A8178] transition-colors duration-300 peer-focus:text-[#5B8C6E]" />
           <input
             type="text"
             placeholder="Search by name or skill..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-full border border-[#EAE1D3] bg-white py-2.5 pl-10 pr-10 text-sm text-[#2B2A28] outline-none transition focus:border-[#5B8C6E] focus:ring-2 focus:ring-[#5B8C6E]/30"
+            className="peer w-full rounded-full border border-[#EAE1D3] bg-white py-3.5 pl-12 pr-10 text-sm text-[#2B2A28] outline-none transition-all duration-300 focus:border-[#5B8C6E] focus:ring-4 focus:ring-[#5B8C6E]/10"
           />
-
           {search && (
             <button
-              type="button"
               onClick={() => setSearch("")}
-              aria-label="Clear search"
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer text-[#8A8178] transition hover:text-[#2B2A28]"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#8A8178] transition-all hover:bg-[#FBF6EF] hover:text-[#E8624F] hover:rotate-90"
             >
               <X className="h-4 w-4" />
             </button>
@@ -123,197 +109,73 @@ export default function Feed() {
         </div>
       </div>
 
-      {/* =================================
-          LOADING STATE
-      ================================= */}
-      {loading ? (
-        <p className="text-center text-sm text-[#8A8178]">
-          Loading Developers...
-        </p>
-      ) : users.length === 0 ? (
-        /* =================================
-            EMPTY / SEARCH RESULT STATE
-        ================================= */
-        <p className="text-center text-sm text-[#8A8178]">
-          {debouncedSearch
-            ? `No developers match "${debouncedSearch}".`
-            : "You're all caught up — no new developers to show right now."}
-        </p>
+      {error && (
+        <div className="mx-auto flex max-w-md flex-col items-center justify-center rounded-xl border border-[#C4483D]/20 bg-[#C4483D]/5 p-6 text-[#C4483D]">
+          <AlertCircle className="mb-2 h-8 w-8 animate-bounce" />
+          <p className="text-sm font-medium">{error}</p>
+        </div>
+      )}
+
+      {/* SKELETON LOADING (Matching exact size of Connection.jsx) */}
+      {loading && !error ? (
+        <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex h-[320px] flex-col rounded-3xl bg-white p-5 shadow-sm border border-[#EAE1D3]/50">
+              <div className="shimmer-bg mx-auto h-16 w-16 rounded-full" />
+              <div className="shimmer-bg mx-auto mt-4 h-4 w-3/4 rounded-full" />
+              <div className="shimmer-bg mx-auto mt-2 h-3 w-1/2 rounded-full" />
+              <div className="mt-6 space-y-2">
+                <div className="shimmer-bg h-3 w-full rounded-full" />
+                <div className="shimmer-bg h-3 w-5/6 rounded-full" />
+              </div>
+              <div className="mt-auto flex gap-2 pt-5">
+                <div className="shimmer-bg h-10 flex-1 rounded-xl" />
+                <div className="shimmer-bg h-10 flex-1 rounded-xl" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : !error && users.length === 0 ? (
+        <div className="mx-auto mt-16 flex max-w-sm flex-col items-center justify-center rounded-3xl border border-[#EAE1D3]/80 bg-white p-10 text-center shadow-xl shadow-[#E8624F]/5 transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl group">
+          <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-tr from-[#FBF6EF] to-[#EAE1D3] shadow-inner transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+            <Users className="h-10 w-10 text-[#8A8178] transition-colors duration-300 group-hover:text-[#E8624F]" />
+          </div>
+          <h3 className="mt-6 text-xl font-bold text-[#2B2A28]">No developers found</h3>
+          <p className="mt-2 text-[13px] text-[#756F68] leading-relaxed">
+            {debouncedSearch
+              ? `We couldn't find anyone matching "${debouncedSearch}".`
+              : "You're all caught up! Check back later for new developers."}
+          </p>
+        </div>
       ) : (
-        /* =================================
-            DEVELOPER GRID
-            max-w-5xl prevents cards from getting too wide
-        ================================= */
-        <div className="mx-auto grid max-w-5xl items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="mx-auto grid max-w-5xl items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {users.map((user, i) => {
-            const skills = user.skills || [];
+            const isActionLoading = requestLoading === user._id;
 
             return (
               <div
                 key={user._id}
-                className="
-                  flex h-full flex-col
-                  rounded-2xl
-                  bg-white
-                  p-5
-                  text-center
-                  shadow-lg shadow-[#E8624F]/5
-                  border border-[#EAE1D3]/50
-                  transition
-                  hover:-translate-y-1
-                  hover:shadow-xl hover:shadow-[#E8624F]/10
-                "
+                style={{
+                  animation: "fadeInUp 0.5s ease-out both",
+                  animationDelay: `${i * 70}ms`,
+                }}
               >
-                {/* =================================
-                    AVATAR (Reduced to h-16 w-16)
-                ================================= */}
-                {/* =================================
-    AVATAR
-================================= */}
-                <div className="mx-auto mb-3">
-                  {user.profilePic ? (
-                    <img
-                      src={`http://localhost:7777${user.profilePic}`}
-                      alt={`${user.firstName} ${user.lastName}`}
-                      className="h-16 w-16 rounded-full object-cover border-2 border-white shadow-sm"
-                    />
-                  ) : (
-                    <div
-                      className="flex h-16 w-16 items-center justify-center rounded-full text-base font-bold text-white"
-                      style={{
-                        backgroundColor: avatarColors[i % avatarColors.length],
-                      }}
-                    >
-                      {user.firstName?.[0]}
-                      {user.lastName?.[0]}
-                    </div>
-                  )}
-                </div>
-
-                {/* =================================
-                    USER NAME
-                ================================= */}
-                <h3 className="flex items-center justify-center text-base font-bold text-[#2B2A28]">
-                  {user.firstName} {user.lastName}
-                </h3>
-
-                {/* =================================
-                    AGE
-                ================================= */}
-                <p className="mt-0.5 flex items-center justify-center text-xs text-[#8A8178]">
-                  {user.age ? `${user.age} years old` : "Age not added yet"}
-                </p>
-
-                {/* =================================
-                    ABOUT (Sleeker line-clamp and tighter min-height)
-                ================================= */}
-                <p className="mt-3 min-h-10 text-[13px] leading-5 text-[#756F68] line-clamp-2">
-                  {user.about || "This developer hasn't added an About yet."}
-                </p>
-
-                {/* =================================
-                    SKILLS
-                ================================= */}
-                <div className="mt-3 min-h-7">
-                  <div className="flex flex-wrap justify-center gap-1.5">
-                    {skills.slice(0, 4).map((skill) => (
-                      <span
-                        key={skill}
-                        className="rounded-full bg-[#FBF6EF] border border-[#EAE1D3] px-2 py-0.5 text-[11px] font-medium text-[#5B8C6E]"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                    {skills.length > 4 && (
-                      <span className="rounded-full bg-[#FBF6EF] border border-[#EAE1D3] px-2 py-0.5 text-[11px] font-medium text-[#8A8178]">
-                        +{skills.length - 4}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* =================================
-                    BOTTOM ACTIONS
-                   
-                ================================= */}
-                <div className="mt-auto flex flex-col pt-5">
-                  {/* =================================
-                      VIEW PROFILE
-                  ================================= */}
+                <UserCard user={user} index={i}>
                   <button
-                    onClick={() => navigate(`/user/${user._id}`)}
-                    className="
-                      mb-3
-                      inline-flex
-                      items-center
-                      justify-center
-                      text-[13px]
-                      font-bold
-                      text-[#5B8C6E]
-                      transition
-                      hover:text-[#4A7359]
-                      hover:underline
-                    "
+                    disabled={isActionLoading}
+                    onClick={() => handleRequest("ignored", user._id)}
+                    className="flex-1 rounded-xl border border-[#EAE1D3] px-3 py-2 text-[13px] font-semibold text-[#8A8178] transition-all hover:bg-[#FBF6EF] hover:text-[#2B2A28] disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                   >
-                    View Profile →
+                    {isActionLoading ? "..." : "Ignore"}
                   </button>
-
-                  {/* =================================
-                      IGNORE + INTERESTED (Sleeker Buttons)
-                  ================================= */}
-                  <div className="flex gap-2.5">
-                    {/* IGNORE */}
-                    <button
-                      disabled={requestLoading === user._id}
-                      onClick={() => handleRequest("ignored", user._id)}
-                      className="
-                        flex-1
-                        cursor-pointer
-                        rounded-full
-                        border
-                        border-[#EAE1D3]
-                        px-3
-                        py-2
-                        text-[13px]
-                        font-semibold
-                        text-[#8A8178]
-                        transition
-                        hover:bg-[#FBF6EF] hover:text-[#2B2A28]
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                      "
-                    >
-                      {requestLoading === user._id ? "..." : "Ignore"}
-                    </button>
-
-                    {/* INTERESTED */}
-                    <button
-                      disabled={requestLoading === user._id}
-                      onClick={() => handleRequest("interested", user._id)}
-                      className="
-                        flex-1
-                        cursor-pointer
-                        rounded-full
-                        bg-[#E8624F]
-                        px-3
-                        py-2
-                        text-[13px]
-                        font-semibold
-                        text-white
-                        shadow-sm
-                        shadow-[#E8624F]/20
-                        transition
-                        hover:bg-[#DA5544]
-                        disabled:cursor-not-allowed
-                        disabled:opacity-50
-                      "
-                    >
-                      {requestLoading === user._id
-                        ? "Sending..."
-                        : "Interested"}
-                    </button>
-                  </div>
-                </div>
+                  <button
+                    disabled={isActionLoading}
+                    onClick={() => handleRequest("interested", user._id)}
+                    className="flex-1 rounded-xl bg-[#E8624F] px-3 py-2 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-[#DA5544] disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  >
+                    {isActionLoading ? "Sending..." : "Interested"}
+                  </button>
+                </UserCard>
               </div>
             );
           })}
