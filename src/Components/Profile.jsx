@@ -23,7 +23,6 @@ export default function Profile() {
   const [editProfile, setEditProfile] = useState({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
-
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -31,16 +30,15 @@ export default function Profile() {
   const [isRemoving, setIsRemoving] = useState(false);
   const [removeError, setRemoveError] = useState(null);
   const [isPhotoOpen, setIsPhotoOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [bioError, setBioError] = useState(null);
 
   useEffect(() => {
     const getProfile = async () => {
       try {
-        const response = await axios.get(
-          `${BASE_URL}/profile/view`,
-          {
-            withCredentials: true,
-          },
-        );
+        const response = await axios.get(`${BASE_URL}/profile/view`, {
+          withCredentials: true,
+        });
 
         console.log(response.data);
         setProfile(response.data);
@@ -63,7 +61,6 @@ export default function Profile() {
     };
   }, [previewUrl]);
 
-  
   useEffect(() => {
     if (!isPhotoOpen) return;
 
@@ -79,7 +76,6 @@ export default function Profile() {
       document.body.style.overflow = "";
     };
   }, [isPhotoOpen]);
-
 
   const updateEducationField = (index, field, value) => {
     const updatedEducation = [...(editProfile.education || [])];
@@ -135,7 +131,6 @@ export default function Profile() {
         },
       );
 
-  
       setProfile((prevProfile) => ({
         ...prevProfile,
         profilePic: response.data.profilePic,
@@ -188,8 +183,8 @@ export default function Profile() {
         age: editProfile.age,
         about: editProfile.about,
         skills: (editProfile.skills || []).filter(Boolean),
-        // strip the client-only "id" used for React keys before sending to the backend
-        education: (editProfile.education || []).map(({  ...edu }) => edu),
+        education: (editProfile.education || []).map(({ ...edu }) => edu),
+
       };
 
       console.log("Sending to API:", updatedData);
@@ -209,6 +204,30 @@ export default function Profile() {
       );
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleGenerateBio = async () => {
+    if (!profile.skills || profile.skills.length === 0) {
+      setBioError("Add your skills and save your profile first");
+      return;
+    }
+    setBioError(null);
+    setIsGenerating(true);
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/ai/bio`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      setEditProfile((prev) => ({ ...prev, about: res.data.bio }));
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+      setBioError(err.response?.data?.message||"Couldn't generate bio. Try again.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -400,10 +419,37 @@ export default function Profile() {
 
           {/* About */}
           <section>
-            <h3 className="flex items-center gap-2 text-lg font-bold text-[#2B2A28]">
-              <FileText className="h-4 w-4 text-[#5B8C6E]" />
-              About
-            </h3>
+            <div className="flex items-center justify-between">
+  <h3 className="flex items-center gap-2 text-lg font-bold text-[#2B2A28]">
+    <FileText className="h-4 w-4 text-[#5B8C6E]" />
+    About
+  </h3>
+
+  {isEditing && (
+    <button
+      type="button"
+      onClick={handleGenerateBio}
+      disabled={isGenerating || isSaving}
+      className="flex items-center gap-1.5 rounded-full border border-[#EAE1D3] bg-[#FBF6EF] px-3 py-1.5 text-xs font-semibold text-[#5B8C6E] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      {isGenerating ? (
+        <>
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          Writing your bio…
+        </>
+      ) : (
+        <>
+          <Sparkles className="h-3.5 w-3.5" />
+          Write my bio
+        </>
+      )}
+    </button>
+  )}
+</div>
+
+{bioError && (
+  <p className="mt-2 text-xs font-medium text-[#C4483D]">{bioError}</p>
+)}
 
             {isEditing ? (
               <textarea

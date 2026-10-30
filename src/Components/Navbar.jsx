@@ -13,37 +13,54 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/profile/view`, {
-          withCredentials: true,
-        });
+ useEffect(() => {
+  let isMounted = true;
+
+  const checkAuth = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/profile/view`, {
+        withCredentials: true,
+      });
+
+      if (isMounted) {
         console.log("AUTH SUCCESS:", res.data);
         setIsLoggedIn(true);
-      } catch (err) {
+      }
+    } catch (err) {
+      if (isMounted) {
         console.log("AUTH FAILED:", err.response?.data || err.message);
         setIsLoggedIn(false);
       }
-    };
-    checkAuth();
-  }, [location.pathname]);
-
-  const handleLogOut = async () => {
-    try {
-      await axios.post(
-        `${BASE_URL}/logout`,
-        {},
-        {
-          withCredentials: true,
-        },
-      );
-      setIsLoggedIn(false);
-      navigate("/login");
-    } catch (err) {
-      console.error(err.response?.data || err.message);
     }
   };
+
+  checkAuth();
+
+  return () => {
+    isMounted = false;
+  };
+}, [location.pathname]);
+
+  const handleLogOut = async () => {
+  try {
+    await axios.post(
+      `${BASE_URL}/logout`,
+      {},
+      { withCredentials: true }
+    );
+
+    setIsLoggedIn(false);
+    setIsMenuOpen(false);
+
+    navigate("/", { replace: true });
+
+  } catch (err) {
+    console.error(
+      "LOGOUT FAILED:",
+      err.response?.data || err.message
+    );
+  }
+};
 
   const navLinkClass = (path) =>
     `text-sm font-medium transition ${
