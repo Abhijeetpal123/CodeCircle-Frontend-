@@ -137,7 +137,6 @@ useEffect(() => {
       navigate("/feed", { replace: true });
     } catch {
       // User is not logged in
-      alert("something went wrong ")
       setCheckingAuth(false);
     }
   };
