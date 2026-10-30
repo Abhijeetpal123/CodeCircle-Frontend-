@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { BASE_URL } from "../utils/constants";
 
 const circles = [
   { size: 110, top: "8%", left: "14%", color: "#5B8C6E", opacity: 0.85 },
@@ -50,7 +51,7 @@ export default function Login() {
     setIsSubmitting(true);
     try {
       await axios.post(
-        "https://codecircle-nq5c.onrender.com/login",
+        `${BASE_URL}/login`,
         {
           emailID: formData.emailID,
           passWord: formData.passWord,

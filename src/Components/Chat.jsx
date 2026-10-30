@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { createSocketConnection } from "../utils/socket";
+import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import {
   ArrowLeft,
@@ -29,7 +30,14 @@ const getProfileImageUrl = (profilePic) => {
     return profilePic;
   }
 
-  return `https://codecircle-nq5c.onrender.com${profilePic}`;
+  return `${BASE_URL}${profilePic}`;
+};
+
+const requestChatHistory = async (targetUserID) => {
+  const response = await axios.get(`${BASE_URL}/chat/${targetUserID}`, {
+    withCredentials: true,
+  });
+  return response.data;
 };
 
 
@@ -350,7 +358,7 @@ export default function Chat() {
       try {
         console.log("1. PROFILE REQUEST START");
 
-        const response = await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
+        const response = await axios.get(`${BASE_URL}/profile/view`, {
           withCredentials: true,
         });
 
@@ -369,7 +377,7 @@ export default function Chat() {
     const getTargetUser = async () => {
       try {
         const response = await axios.get(
-          `https://codecircle-nq5c.onrender.com/user/${targetUserID}`,
+          `${BASE_URL}/user/${targetUserID}`,
           { withCredentials: true },
         );
         setTargetUser(response.data.data || response.data);
@@ -414,33 +422,62 @@ export default function Chat() {
     };
   }, [currentUsers, targetUserID]);
 
+   const [historyTargetId, setHistoryTargetId] = useState(null);
+
+  // Load chat history when the current user and target user are available.
+  useEffect(() => {
+    if (!currentUsers?._id || !targetUserID) return;
+
+    let cancelled = false;
+
+    const loadChatHistory = async () => {
+      try {
+        const chatHistory = await requestChatHistory(targetUserID);
+
+        if (!cancelled) {
+          setMessages(chatHistory);
+          setHistoryError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.error(err.response?.data || err.message);
+          setHistoryError("Couldn't load this conversation.");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingHistory(false);
+          setHistoryTargetId(targetUserID);
+        }
+      }
+    };
+
+    loadChatHistory();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUsers?._id, targetUserID]);
+
+  // Retry is triggered by a user action, so loading state can be set here.
   const getChatHistory = async () => {
     if (!currentUsers?._id || !targetUserID) return;
 
     setHistoryError(null);
     setIsLoadingHistory(true);
+
     try {
-      const response = await axios.get(
-        `https://codecircle-nq5c.onrender.com/chat/${targetUserID}`,
-        {
-          withCredentials: true,
-        },
-      );
-      setMessages(response.data);
+      const chatHistory = await requestChatHistory(targetUserID);
+      setMessages(chatHistory);
     } catch (err) {
       console.error(err.response?.data || err.message);
       setHistoryError("Couldn't load this conversation.");
     } finally {
       setIsLoadingHistory(false);
+      setHistoryTargetId(targetUserID);
     }
   };
 
-  useEffect(() => {
-    getChatHistory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUsers, targetUserID]);
-
-  const handleSend = () => {
+const handleSend = () => {
     if (!message.trim()) return;
 
     socketRef.current.emit("sendMessage", {
@@ -464,7 +501,7 @@ export default function Chat() {
   currentUserId={currentUsers?._id}
   currentUser={currentUsers}
   targetUser={targetUser}
-  isLoading={isLoadingHistory}
+  isLoading={isLoadingHistory || historyTargetId !== targetUserID}
   error={historyError}
   onRetry={getChatHistory}
 />

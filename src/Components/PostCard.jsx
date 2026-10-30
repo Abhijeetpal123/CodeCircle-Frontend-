@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import { BASE_URL } from "../utils/constants";
 import { Pencil, Trash2 } from "lucide-react";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
@@ -43,7 +44,7 @@ export default function PostCard({
     setIsSaving(true);
     try {
       const response = await axios.patch(
-        `https://codecircle-nq5c.onrender.com/post/${post._id}`,
+        `${BASE_URL}/post/${post._id}`,
         {
           title: editTitle,
           content: editContent,
@@ -74,7 +75,7 @@ export default function PostCard({
     setIsDeleting(true);
     try {
       const response = await axios.delete(
-        `https://codecircle-nq5c.onrender.com/post/${post._id}`,
+        `${BASE_URL}/post/${post._id}`,
         {
           withCredentials: true,
         },
@@ -139,7 +140,7 @@ export default function PostCard({
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                 {post.createdBy?.profilePic ? (
                   <img
-                    src={`https://codecircle-nq5c.onrender.com${post.createdBy.profilePic}`}
+                    src={`${BASE_URL}${post.createdBy.profilePic}`}
                     alt={`${post.createdBy?.firstName || ""} ${post.createdBy?.lastName || ""}`}
                     className="h-full w-full object-cover"
                   />

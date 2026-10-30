@@ -3,6 +3,8 @@ import axios from "axios";
 import { Search, X, Users, AlertCircle } from "lucide-react";
 import UserCard from "./UserCard";
 import toast from 'react-hot-toast';
+import { BASE_URL } from "../utils/constants";
+
 
 export default function Feed() {
   const [users, setUsers] = useState([]);
@@ -23,12 +25,12 @@ export default function Feed() {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          `https://codecircle-nq5c.onrender.com/user/feed?page=1&limit=12&search=${debouncedSearch}`,
+          `${BASE_URL}/user/feed?page=1&limit=12&search=${debouncedSearch}`,
           { withCredentials: true }
         );
         setUsers(response.data.data || []);
       } catch (err) {
-        setError("Unable to load developers. Please try again later.");
+        setError("Unable to load developers. Please try again later.",err);
       } finally {
         setLoading(false);
       }
@@ -40,7 +42,7 @@ export default function Feed() {
   try {
     setRequestLoading(toUserId);
     await axios.post(
-      `https://codecircle-nq5c.onrender.com/request/send/${status}/${toUserId}`,
+      `${BASE_URL}/request/send/${status}/${toUserId}`,
       {},
       { withCredentials: true }
     );
@@ -56,7 +58,7 @@ export default function Feed() {
 
   } catch (err) {
     // Error aane par laal rang ka error toast aayega
-    toast.error("Failed to send request. Please try again.");
+    toast.error("Failed to send request. Please try again.",err);
   } finally {
     setRequestLoading(null);
   }
@@ -64,13 +66,13 @@ export default function Feed() {
 
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-6 font-sans">
-      {/* Custom keyframes to match Connection.jsx */}
+      {/* Custom keyframes to match Connect ion.jsx */}
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes shimmer {
+        @keyframes shimmer {        
           0% { background-position: -400px 0; }
           100% { background-position: 400px 0; }
         }

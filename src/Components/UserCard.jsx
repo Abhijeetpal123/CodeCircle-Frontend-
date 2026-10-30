@@ -1,6 +1,8 @@
 // UserCard.jsx (Sirf ek hi file rahegi pure project mein)
 import { Link } from "react-router-dom";
 import { UserPlus, ArrowRight } from "lucide-react";
+import { BASE_URL } from "../utils/constants";
+
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
@@ -44,7 +46,7 @@ export default function UserCard({
             src={
               user.profilePic.startsWith("http")
                 ? user.profilePic
-                : `https://codecircle-nq5c.onrender.com${user.profilePic}`
+                : `${BASE_URL}${user.profilePic}`
             }
             alt={`${user.firstName} ${user.lastName}`}
             className="h-14 w-14 rounded-full border-2 object-cover shadow-sm"

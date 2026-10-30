@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { Compass, Users, Sprout } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+
 
 const techStack = ["React", "Node.js", "Python", "Go", "TypeScript", "Rust"];
 
@@ -127,14 +129,15 @@ const [checkingAuth, setCheckingAuth] = useState(true);
 useEffect(() => {
   const checkAuth = async () => {
     try {
-      await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
+      await axios.get(`${BASE_URL}/profile/view`, {
         withCredentials: true,
       });
 
       // User is already logged in
       navigate("/feed", { replace: true });
-    } catch (err) {
+    } catch {
       // User is not logged in
+      alert("something went wrong ")
       setCheckingAuth(false);
     }
   };

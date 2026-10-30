@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+
 import {
   Loader2,
   AlertCircle,
@@ -34,7 +36,7 @@ export default function Profile() {
     const getProfile = async () => {
       try {
         const response = await axios.get(
-          "https://codecircle-nq5c.onrender.com/profile/view",
+          `${BASE_URL}/profile/view`,
           {
             withCredentials: true,
           },
@@ -126,7 +128,7 @@ export default function Profile() {
     setUploading(true);
     try {
       const response = await axios.patch(
-        "https://codecircle-nq5c.onrender.com/profile/photo",
+        `${BASE_URL}/profile/photo`,
         formData,
         {
           withCredentials: true,
@@ -160,7 +162,7 @@ export default function Profile() {
     setRemoveError(null);
     setIsRemoving(true);
     try {
-      await axios.delete("https://codecircle-nq5c.onrender.com/profile/photo", {
+      await axios.delete(`${BASE_URL}/profile/photo`, {
         withCredentials: true,
       });
       setProfile((prev) => ({ ...prev, profilePic: null }));
@@ -187,12 +189,12 @@ export default function Profile() {
         about: editProfile.about,
         skills: (editProfile.skills || []).filter(Boolean),
         // strip the client-only "id" used for React keys before sending to the backend
-        education: (editProfile.education || []).map(({ id, ...edu }) => edu),
+        education: (editProfile.education || []).map(({  ...edu }) => edu),
       };
 
       console.log("Sending to API:", updatedData);
 
-      await axios.patch("https://codecircle-nq5c.onrender.com/profile/edit", updatedData, {
+      await axios.patch(`${BASE_URL}/profile/edit`, updatedData, {
         withCredentials: true,
       });
 
@@ -225,7 +227,7 @@ export default function Profile() {
   const avatarColor = avatarColors[0];
   const displayImageSrc =
     previewUrl ||
-    (profile?.profilePic ? `https://codecircle-nq5c.onrender.com${profile.profilePic}` : null);
+    (profile?.profilePic ? `${BASE_URL}${profile.profilePic}` : null);
 
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-10">

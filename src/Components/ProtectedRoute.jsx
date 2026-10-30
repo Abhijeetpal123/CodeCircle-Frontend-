@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
+import {BASE_URL} from "../utils/constants"
 
 export default function ProtectedRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,7 +10,7 @@ export default function ProtectedRoute({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
+        await axios.get(`${BASE_URL}/profile/view`, {
           withCredentials: true,
         });
 

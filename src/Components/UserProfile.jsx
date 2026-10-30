@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FileText, Sparkles, GraduationCap } from "lucide-react";
+import { BASE_URL } from "../utils/constants";
+
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
@@ -15,7 +17,7 @@ export default function UserProfile() {
     const getUserProfile = async () => {
       try {
         const response = await axios.get(
-          `https://codecircle-nq5c.onrender.com/user/${userId}`,
+          `${BASE_URL}/user/${userId}`,
           {
             withCredentials: true,
           },

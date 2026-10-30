@@ -2,6 +2,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import PostCard from "./PostCard";
+import { BASE_URL } from "../utils/constants";
+
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
@@ -27,7 +29,7 @@ export default function Post() {
   useEffect(() => {
     const getPosts = async () => {
       try {
-        const response = await axios.get("https://codecircle-nq5c.onrender.com/post", {
+        const response = await axios.get(`${BASE_URL}/post`, {
           withCredentials: true,
         });
 
@@ -47,7 +49,7 @@ export default function Post() {
     const getProfile = async () => {
       try {
         const response = await axios.get(
-          "https://codecircle-nq5c.onrender.com/profile/view",
+          `${BASE_URL}/profile/view`,
           { withCredentials: true },
         );
 
@@ -69,7 +71,7 @@ export default function Post() {
     setIsPosting(true);
     try {
       const response = await axios.post(
-        "https://codecircle-nq5c.onrender.com/post",
+        `${BASE_URL}/post`,
         { title, content },
         { withCredentials: true },
       );
@@ -137,7 +139,7 @@ export default function Post() {
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
   {currentUser?.profilePic ? (
     <img
-      src={`https://codecircle-nq5c.onrender.com${currentUser.profilePic}`}
+      src={`${BASE_URL}${currentUser.profilePic}`}
       alt={`${currentUser.firstName || ""} ${currentUser.lastName || ""}`}
       className="h-full w-full object-cover"
     />

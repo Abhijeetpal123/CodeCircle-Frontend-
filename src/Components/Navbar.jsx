@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import axios from "axios";
+import { BASE_URL } from "../utils/constants";
+
 
 export default function Navbar() {
   const location = useLocation();
@@ -14,7 +16,7 @@ export default function Navbar() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await axios.get("https://codecircle-nq5c.onrender.com/profile/view", {
+        const res = await axios.get(`${BASE_URL}/profile/view`, {
           withCredentials: true,
         });
         console.log("AUTH SUCCESS:", res.data);
@@ -30,7 +32,7 @@ export default function Navbar() {
   const handleLogOut = async () => {
     try {
       await axios.post(
-        "https://codecircle-nq5c.onrender.com/logout",
+        `${BASE_URL}/logout`,
         {},
         {
           withCredentials: true,
@@ -58,7 +60,7 @@ export default function Navbar() {
           to={isLoggedIn?"/feed":"/"}
           className="inline-flex items-center gap-1.5 text-lg font-bold text-[#2B2A28]"
           aria-label="CodeCircle home"
-        >
+        > 
           CodeCircle
           <span className="h-2 w-2 rounded-full bg-[#E8624F] motion-safe:animate-pulse" />
         </Link>

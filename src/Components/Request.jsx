@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { UserCheck, AlertCircle, Inbox } from "lucide-react";
 import UserCard from "./UserCard";
+import { BASE_URL } from "../utils/constants";
+
 
 export default function Request() {
   const [requests, setRequests] = useState([]);
@@ -15,11 +17,11 @@ export default function Request() {
         setLoading(true);
         setError(null);
         const response = await axios.get(
-          "https://codecircle-nq5c.onrender.com/user/request/received",
+          `${BASE_URL}/user/request/received`,
           { withCredentials: true }
         );
         setRequests(response.data.data || []);
-      } catch (err) {
+      } catch{
         setError("Failed to load connection requests.");
       } finally {
         setLoading(false);
@@ -32,12 +34,12 @@ export default function Request() {
     setReviewLoading(requestId);
     try {
       await axios.post(
-        `https://codecircle-nq5c.onrender.com/request/review/${status}/${requestId}`,
+        `${BASE_URL}/request/review/${status}/${requestId}`,
         {},
         { withCredentials: true }
       );
       setRequests((prev) => prev.filter((req) => req._id !== requestId));
-    } catch (err) {
+    } catch {
       alert("Something went wrong. Please try again.");
     } finally {
       setReviewLoading(null);

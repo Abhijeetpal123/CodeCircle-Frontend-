@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { BASE_URL } from "../utils/constants";
+
 
 // Loose, hand-placed cluster — deliberately not a grid, to feel organic.
 const circles = [
@@ -58,7 +60,7 @@ export default function Signup() {
     setIsSubmitting(true);
     try {
       await axios.post(
-        "https://codecircle-nq5c.onrender.com/signup",
+        `${BASE_URL}/signup`,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,

@@ -3,6 +3,8 @@ import axios from "axios";
 import { AlertCircle, Users, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserCard from "./UserCard";
+import { BASE_URL } from "../utils/constants";
+
 
 export default function Connection() {
   const [connections, setConnections] = useState([]);
@@ -15,7 +17,7 @@ export default function Connection() {
         setIsLoading(true);
         setError(null);
         const response = await axios.get(
-          "https://codecircle-nq5c.onrender.com/user/connections",
+          `${BASE_URL}/user/connections`,
           { withCredentials: true }
         );
         setConnections(response.data.data || []);

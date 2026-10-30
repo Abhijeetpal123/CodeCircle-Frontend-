@@ -1,5 +1,6 @@
 import { io } from "socket.io-client";
+import { BASE_URL } from "./constants";
 
 export const createSocketConnection = () => {
-  return io("https://codecircle-nq5c.onrender.com");
+  return io(`${BASE_URL}`);
 };
