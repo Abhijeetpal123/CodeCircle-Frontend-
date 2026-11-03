@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import ProfilePhoto from "./profile/ProfilePhoto";
-import { Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import PhotoLightbox from "./profile/PhotoLightbox";
 import AboutSection from "./profile/AboutSection";
 import SkillsSection from "./profile/SkillSection";
 import EducationSection from "./profile/EducationSection";
-import PersonalInfo  from "./profile/PersonalInfo";
+import PersonalInfo from "./profile/PersonalInfo";
+import ProfileActions from "./profile/ProfileActions";
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 const MAX_FILE_SIZE_MB = 5;
 
@@ -282,12 +283,12 @@ export default function Profile() {
           />
           {/* Name + age */}
           <PersonalInfo
-  isEditing={isEditing}
-  editProfile={editProfile}
-  setEditProfile={setEditProfile}
-  isSaving={isSaving}
-  profile={profile}
-/>
+            isEditing={isEditing}
+            editProfile={editProfile}
+            setEditProfile={setEditProfile}
+            isSaving={isSaving}
+            profile={profile}
+          />
           {/* Divider */}
           <div className="my-8 border-t border-[#EAE1D3]" />
 
@@ -326,51 +327,16 @@ export default function Profile() {
             updateEducationField={updateEducationField}
             removeEducation={removeEducation}
           />
-
           {/* Edit / Save buttons */}
-          {isEditing ? (
-            <div className="mt-8 flex gap-3">
-              <button
-                onClick={() => {
-                  setIsEditing(false);
-                  setSaveError(null);
-                }}
-                disabled={isSaving}
-                className="flex-1 rounded-full border border-[#EAE1D3] px-6 py-2.5 text-sm font-semibold text-[#8A8178] transition hover:bg-[#F3E9DC] disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#E8624F] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Saving…
-                  </>
-                ) : (
-                  "Save changes"
-                )}
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => {
-                setIsEditing(true);
-                // BUG FIX: Ensure arrays exist when entering edit mode
-                setEditProfile({
-                  ...profile,
-                  education: profile.education || [],
-                  skills: profile.skills || [],
-                });
-              }}
-              className="mt-8 w-full rounded-full bg-[#E8624F] px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-[#E8624F]/30 transition hover:bg-[#DA5544]"
-            >
-              Edit profile
-            </button>
-          )}
+          <ProfileActions
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            isSaving={isSaving}
+            handleSave={handleSave}
+            setSaveError={setSaveError}
+            profile={profile}
+            setEditProfile={setEditProfile}
+          />
         </div>
       </div>
       <PhotoLightbox
