@@ -9,12 +9,12 @@ import SkillsSection from "./profile/SkillSection";
 import EducationSection from "./profile/EducationSection";
 import PersonalInfo from "./profile/PersonalInfo";
 import ProfileActions from "./profile/ProfileActions";
+import useProfileData from "../hooks/useProfileData";
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 const MAX_FILE_SIZE_MB = 5;
 
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
-  const [loadError, setLoadError] = useState(null);
+  const { profile, setProfile, loadError } = useProfileData();
   const [isEditing, setIsEditing] = useState(false);
   const [editProfile, setEditProfile] = useState({});
   const [isSaving, setIsSaving] = useState(false);
@@ -29,27 +29,7 @@ export default function Profile() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [bioError, setBioError] = useState(null);
 
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/profile/view`, {
-          withCredentials: true,
-        });
-
-        console.log(response.data);
-        setProfile(response.data);
-      } catch (err) {
-        console.error(err.response?.data || err.message);
-        setLoadError(
-          err.response?.data?.message ||
-            err.response?.data ||
-            "Couldn't load your profile.",
-        );
-      }
-    };
-
-    getProfile();
-  }, []);
+  
 
   useEffect(() => {
     return () => {
