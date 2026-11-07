@@ -1,43 +1,12 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { FileText, Sparkles, GraduationCap } from "lucide-react";
-import { BASE_URL } from "../utils/constants";
-
-
+import useUserProfile from "../hooks/useUserProfile";
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
 export default function UserProfile() {
   const { userId } = useParams();
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const getUserProfile = async () => {
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/user/${userId}`,
-          {
-            withCredentials: true,
-          },
-        );
-        console.log(response.data);
-        setUser(response.data.data);
-      } catch (err) {
-        console.error(err.response?.data || err.message);
-        setError(
-          err.response?.data?.message ||
-            err.response?.data ||
-            "Couldn't load this profile.",
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getUserProfile();
-  }, [userId]);
+  const { user, isLoading, error } = useUserProfile(userId);
 
   if (isLoading) {
     return (

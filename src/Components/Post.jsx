@@ -1,9 +1,9 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import PostCard from "./PostCard";
 import { BASE_URL } from "../utils/constants";
-
+import usePostData from "../hooks/usePostData";
+import useCreatePost from "../hooks/useCreatePost";
 
 const avatarColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
 
@@ -17,84 +17,24 @@ const getAvatarColor = (id) => {
 };
 
 export default function Post() {
-  const [posts, setPosts] = useState([]);
-  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [currentUser, setCurrentUser] = useState(null);
-  const [isPosting, setIsPosting] = useState(false);
-  const [postError, setPostError] = useState(null);
-  const [justPostedId, setJustPostedId] = useState(null);
+  const { posts, setPosts, isLoadingPosts, currentUser } = usePostData();
+  const { isPosting, postError, justPostedId, handleCreatePost } =
+    useCreatePost(setPosts);
 
-  useEffect(() => {
-    const getPosts = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/post`, {
-          withCredentials: true,
-        });
+const handleSubmit = (e) => {
+  e.preventDefault();
 
-        console.log("Posts:", response.data);
-        setPosts(response.data);
-      } catch (err) {
-        console.error(err.response?.data || err.message);
-      } finally {
-        setIsLoadingPosts(false);
-      }
-    };
-
-    getPosts();
-  }, []);
-
-  useEffect(() => {
-    const getProfile = async () => {
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/profile/view`,
-          { withCredentials: true },
-        );
-
-        console.log("Current User Response:", response.data);
-        setCurrentUser(response.data);
-      } catch (err) {
-        console.error(err.response?.data || err.message);
-      }
-    };
-
-    getProfile();
-  }, []);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!title.trim() || !content.trim()) return;
-
-    setPostError(null);
-    setIsPosting(true);
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/post`,
-        { title, content },
-        { withCredentials: true },
-      );
-
-      console.log("Created Post:", response.data);
-
-      setPosts((prevPosts) => [response.data, ...prevPosts]);
-      setJustPostedId(response.data._id);
-      setTimeout(() => setJustPostedId(null), 2000);
-
+  handleCreatePost({
+    title,
+    content,
+    resetForm: () => {
       setTitle("");
       setContent("");
-    } catch (err) {
-      console.error(err.response?.data || err.message);
-      setPostError(
-        err.response?.data?.message ||
-          err.response?.data ||
-          "Couldn't publish your post. Try again.",
-      );
-    } finally {
-      setIsPosting(false);
-    }
-  };
+    },
+  });
+};
 
   const handlePostUpdated = (updatedPost) => {
     setPosts((prevPosts) =>
@@ -137,22 +77,22 @@ export default function Post() {
 
           <div className="flex gap-3">
             <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-  {currentUser?.profilePic ? (
-    <img
-      src={`${BASE_URL}${currentUser.profilePic}`}
-      alt={`${currentUser.firstName || ""} ${currentUser.lastName || ""}`}
-      className="h-full w-full object-cover"
-    />
-  ) : (
-    <div
-      className="flex h-full w-full items-center justify-center rounded-full text-sm font-bold text-white"
-      style={{ backgroundColor: composerColor }}
-    >
-      {currentUser?.firstName?.[0]}
-      {currentUser?.lastName?.[0]}
-    </div>
-  )}
-</div>
+              {currentUser?.profilePic ? (
+                <img
+                  src={`${BASE_URL}${currentUser.profilePic}`}
+                  alt={`${currentUser.firstName || ""} ${currentUser.lastName || ""}`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-full w-full items-center justify-center rounded-full text-sm font-bold text-white"
+                  style={{ backgroundColor: composerColor }}
+                >
+                  {currentUser?.firstName?.[0]}
+                  {currentUser?.lastName?.[0]}
+                </div>
+              )}
+            </div>
 
             <div className="flex-1 space-y-3">
               <input

@@ -1,66 +1,19 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import useNavbarAuth from "../hooks/useNavbarAuth";
 
 
-export default function Navbar() {
+
+  export default function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const { isLoggedIn, handleLogOut } = useNavbarAuth();
 
   const isActive = (path) => location.pathname === path;
 
- useEffect(() => {
-  let isMounted = true;
-
-  const checkAuth = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/profile/view`, {
-        withCredentials: true,
-      });
-
-      if (isMounted) {
-        console.log("AUTH SUCCESS:", res.data);
-        setIsLoggedIn(true);
-      }
-    } catch (err) {
-      if (isMounted) {
-        console.log("AUTH FAILED:", err.response?.data || err.message);
-        setIsLoggedIn(false);
-      }
-    }
-  };
-
-  checkAuth();
-
-  return () => {
-    isMounted = false;
-  };
-}, [location.pathname]);
-
-  const handleLogOut = async () => {
-  try {
-    await axios.post(
-      `${BASE_URL}/logout`,
-      {},
-      { withCredentials: true }
-    );
-
-    setIsLoggedIn(false);
-    setIsMenuOpen(false);
-
-    navigate("/", { replace: true });
-
-  } catch (err) {
-    console.error(
-      "LOGOUT FAILED:",
-      err.response?.data || err.message
-    );
-  }
-};
 
   const navLinkClass = (path) =>
     `text-sm font-medium transition ${

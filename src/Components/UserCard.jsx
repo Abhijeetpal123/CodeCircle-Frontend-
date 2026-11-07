@@ -15,7 +15,7 @@ export default function UserCard({
 }) {
   if (!user) return null;
 
-  const skills = user.skills || [];
+  const skills = Array.isArray(user.skills) ? user.skills : [];
   const visibleSkills = skills.slice(0, 4);
   const extraSkillsCount = skills.length - visibleSkills.length;
   const color = avatarColors[index % avatarColors.length];

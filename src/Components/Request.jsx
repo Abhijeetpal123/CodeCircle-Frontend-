@@ -1,51 +1,16 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { UserCheck, AlertCircle, Inbox } from "lucide-react";
 import UserCard from "./UserCard";
-import { BASE_URL } from "../utils/constants";
-
+import useReceivedRequests from "../hooks/useReceivedRequests";
+import useRequestActions from "../hooks/useRequestActions";
 
 export default function Request() {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [reviewLoading, setReviewLoading] = useState(null);
+   const { requests, setRequests, loading, error } =
+    useReceivedRequests();
 
-  useEffect(() => {
-    const getRequest = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await axios.get(
-          `${BASE_URL}/user/request/received`,
-          { withCredentials: true }
-        );
-        setRequests(response.data.data || []);
-      } catch{
-        setError("Failed to load connection requests.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    getRequest();
-  }, []);
-
-  const handleReview = async (status, requestId) => {
-    setReviewLoading(requestId);
-    try {
-      await axios.post(
-        `${BASE_URL}/request/review/${status}/${requestId}`,
-        {},
-        { withCredentials: true }
-      );
-      setRequests((prev) => prev.filter((req) => req._id !== requestId));
-    } catch {
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setReviewLoading(null);
-    }
-  };
-
+  const { reviewLoading, handleReview } =
+    useRequestActions(setRequests);
+ 
+  
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-6 font-sans">
       <style>{`

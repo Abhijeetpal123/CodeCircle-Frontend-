@@ -1,43 +1,14 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 import { AlertCircle, Users, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
 import UserCard from "./UserCard";
-import { BASE_URL } from "../utils/constants";
+import useConnections from "../hooks/useConnections";
 
 
 export default function Connection() {
-  const [connections, setConnections] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const getConnections = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
-        const response = await axios.get(
-          `${BASE_URL}/user/connections`,
-          { withCredentials: true }
-        );
-        setConnections(response.data.data || []);
-      } catch (err) {
-        console.error(err.response?.data || err.message);
-        setError(
-          err.response?.data?.message ||
-          err.response?.data ||
-          "Couldn't load your connections."
-        );
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getConnections();
-  }, []);
+  const { connections, isLoading, error } = useConnections();
 
   return (
     <main className="min-h-screen bg-[#FBF6EF] px-4 py-6 font-sans">
-      {/* Custom keyframes — no plugin needed, works regardless of tailwind.config.js */}
       <style>{`
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(16px); }
@@ -59,12 +30,14 @@ export default function Connection() {
           <h1 className="cursor-default text-2xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-[#5B8C6E] via-[#4A7359] to-[#E8624F] transition-transform duration-500 hover:scale-105">
             Your Connections
           </h1>
+
           {connections.length > 0 && !isLoading && (
             <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#5B8C6E] px-2 text-xs font-bold text-white shadow-md">
               {connections.length}
             </span>
           )}
         </div>
+
         <p className="text-sm text-[#756F68] transition-colors duration-300 group-hover:text-[#2B2A28]">
           People you've successfully connected with.
         </p>
@@ -87,10 +60,12 @@ export default function Connection() {
               <div className="shimmer-bg mx-auto h-16 w-16 rounded-full" />
               <div className="shimmer-bg mx-auto mt-4 h-4 w-3/4 rounded-full" />
               <div className="shimmer-bg mx-auto mt-2 h-3 w-1/2 rounded-full" />
+
               <div className="mt-6 space-y-2">
                 <div className="shimmer-bg h-3 w-full rounded-full" />
                 <div className="shimmer-bg h-3 w-5/6 rounded-full" />
               </div>
+
               <div className="mt-auto flex pt-5">
                 <div className="shimmer-bg h-10 w-full rounded-xl" />
               </div>
@@ -102,10 +77,15 @@ export default function Connection() {
           <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-linear-to-tr from-[#FBF6EF] to-[#EAE1D3] shadow-inner transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
             <Users className="h-10 w-10 text-[#8A8178] transition-colors duration-300 group-hover:text-[#5B8C6E]" />
           </div>
-          <h3 className="mt-6 text-xl font-bold text-[#2B2A28]">No connections yet</h3>
+
+          <h3 className="mt-6 text-xl font-bold text-[#2B2A28]">
+            No connections yet
+          </h3>
+
           <p className="mt-2 text-[13px] text-[#756F68] leading-relaxed">
             Go say hi to someone in Discover and start building your network!
           </p>
+
           <Link to="/feed">
             <button className="mt-6 rounded-full bg-[#5B8C6E] px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#4A7359] hover:-translate-y-1 active:scale-95">
               Explore Discover

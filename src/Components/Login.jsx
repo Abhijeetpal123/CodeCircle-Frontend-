@@ -1,9 +1,7 @@
-import axios from "axios";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
-import { BASE_URL } from "../utils/constants";
-
+import useLogin from "../hooks/useLogin";
 const circles = [
   { size: 110, top: "8%", left: "14%", color: "#5B8C6E", opacity: 0.85 },
   { size: 50, top: "6%", left: "50%", color: "#E8624F", opacity: 0.8 },
@@ -26,49 +24,16 @@ const bullets = [
 ];
 
 const bulletColors = ["#5B8C6E", "#E8624F", "#E8A94C"];
-
 export default function Login() {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    emailID: "",
-    passWord: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((previousData) => ({
-      ...previousData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-    try {
-      await axios.post(
-        `${BASE_URL}/login`,
-        {
-          emailID: formData.emailID,
-          passWord: formData.passWord,
-        },
-        { withCredentials: true },
-      );
-      navigate("/feed"); // adjust to wherever a logged-in user should land
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.response?.data ||
-          "Something went wrong. Try again.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const {
+    formData,
+    isSubmitting,
+    error,
+    handleChange,
+    handleSubmit,
+  } = useLogin();
 
   return (
     <main className="grid min-h-screen bg-[#FBF6EF] lg:grid-cols-2">
